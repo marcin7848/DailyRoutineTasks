@@ -62,12 +62,12 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
         FloatingActionButton defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
         defaultTasksAddButton.setOnClickListener(v -> {
-            this.toggle(!bottomPanelShown);
+            this.showBottomPanel(!bottomPanelShown);
         });
 
         View defaultTasksShadow = findViewById(R.id.defaultTasksShadow);
         defaultTasksShadow.setOnClickListener(v -> {
-            this.toggle(!bottomPanelShown);
+            this.showBottomPanel(!bottomPanelShown);
         });
 
     }
@@ -106,7 +106,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
         }
     }
 
-    private void toggle(boolean show) {
+    private void showBottomPanel(boolean show) {
         bottomPanelShown = !bottomPanelShown;
         View defaultTasksBottomPanel = findViewById(R.id.defaultTasksBottomPanel);
         ViewGroup parent = findViewById(R.id.defaultTasksParent);
@@ -128,7 +128,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && bottomPanelShown) {
-            this.toggle(!bottomPanelShown);
+            this.showBottomPanel(!bottomPanelShown);
             return true;
         }
         return super.onKeyDown(keyCode, event);

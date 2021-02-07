@@ -50,7 +50,11 @@
         android:background="@color/white"
         android:orientation="vertical"
         android:layout_gravity="bottom|end"
-        android:visibility="gone"
-        android:clickable="true"/>
+        android:visibility="visible"
+        android:clickable="true">
+
+
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
