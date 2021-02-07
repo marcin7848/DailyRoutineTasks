@@ -4,16 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,8 +31,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
     ListView defaultTasksListView;
     List<DefaultTask> tasks = new ArrayList<>();;
-
-    boolean test = false;
+    boolean bottomPanelShown = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +62,12 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
         FloatingActionButton defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
         defaultTasksAddButton.setOnClickListener(v -> {
-            this.toggle(!test);
+            this.toggle(!bottomPanelShown);
         });
 
         View defaultTasksShadow = findViewById(R.id.defaultTasksShadow);
         defaultTasksShadow.setOnClickListener(v -> {
-            this.toggle(!test);
+            this.toggle(!bottomPanelShown);
         });
 
     }
@@ -113,7 +107,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
     }
 
     private void toggle(boolean show) {
-        test = !test;
+        bottomPanelShown = !bottomPanelShown;
         View defaultTasksBottomPanel = findViewById(R.id.defaultTasksBottomPanel);
         ViewGroup parent = findViewById(R.id.defaultTasksParent);
 
@@ -133,8 +127,8 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && test) {
-            this.toggle(!test);
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && bottomPanelShown) {
+            this.toggle(!bottomPanelShown);
             return true;
         }
         return super.onKeyDown(keyCode, event);
