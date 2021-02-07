@@ -67,11 +67,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()){
             case R.id.defaultTasks:
-                Intent intentDefaultTasks = new Intent(this, DefaultTasks.class);
+                Intent intentDefaultTasks = new Intent(this, DefaultTasksActivity.class);
                 startActivity(intentDefaultTasks);
                 return true;
             case R.id.habits:
-                Intent intentHabits = new Intent(this, Habits.class);
+                Intent intentHabits = new Intent(this, HabitsActivity.class);
                 startActivity(intentHabits);
                 return true;
             case R.id.settings:

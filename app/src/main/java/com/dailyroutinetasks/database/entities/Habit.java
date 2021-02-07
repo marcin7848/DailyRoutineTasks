@@ -35,4 +35,9 @@ public class Habit {
     @ColumnInfo(name = "order_number")
     private Integer orderNumber;
 
+    @ColumnInfo(name = "active")
+    private Boolean active;
+
+    @ColumnInfo(name = "days_of_week")
+    private Integer daysOfWeek;
 }

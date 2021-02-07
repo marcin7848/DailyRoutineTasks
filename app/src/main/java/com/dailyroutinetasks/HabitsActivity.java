@@ -5,12 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-public class DefaultTasks extends AppCompatActivity {
+public class HabitsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_default_tasks);
+        setContentView(R.layout.activity_habits);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
