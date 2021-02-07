@@ -1,6 +1,7 @@
 package com.dailyroutinetasks.database.dao;
 
 import androidx.room.Dao;
+import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.dailyroutinetasks.database.entities.DefaultTask;
@@ -15,5 +16,7 @@ public interface DefaultTaskDao {
     @Query("SELECT * FROM defaulttask WHERE id IN (:ids)")
     List<DefaultTask> loadAllByIds(int[] ids);
 
+    @Insert
+    void insertDefaultTask(DefaultTask defaultTask);
 
 }

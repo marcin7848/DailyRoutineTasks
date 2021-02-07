@@ -4,9 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -15,12 +19,15 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dailyroutinetasks.database.AppDatabase;
 import com.dailyroutinetasks.database.entities.DefaultTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -29,9 +36,11 @@ import java.util.List;
 
 public class DefaultTasksActivity extends AppCompatActivity {
 
-    ListView defaultTasksListView;
-    List<DefaultTask> tasks = new ArrayList<>();;
     boolean bottomPanelShown = false;
+    boolean titleError = false;
+    boolean durationError = false;
+    AppDatabase db;
+    List<DefaultTask> defaultTasks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,43 +52,112 @@ public class DefaultTasksActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        defaultTasksListView = findViewById(R.id.defaultTasksListView);
+        this.db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "dailyRoutineTasksDb").build();
 
-        tasks.add(new DefaultTask("Title1", 1, 34, 1));
-        tasks.add(new DefaultTask("Title2", 2, 11, 2));
-        tasks.add(new DefaultTask("Title2", 2, 11, 2));
-        tasks.add(new DefaultTask("Title2", 2, 11, 2));
-        tasks.add(new DefaultTask("Title2", 2, 11, 2));
-        tasks.add(new DefaultTask("Title2", 2, 11, 2));
-        tasks.add(new DefaultTask("Title2", 2, 11, 2));
-        tasks.add(new DefaultTask("Title2", 2, 11, 2));
-        tasks.add(new DefaultTask("Title2", 2, 11, 2));
-        tasks.add(new DefaultTask("Title3", 2, 11, 2));
-        tasks.add(new DefaultTask("Title4", 2, 11, 2));
-
-        DefaultTaskAdapter defaultTaskAdapter = new DefaultTaskAdapter(this, tasks);
+        ListView defaultTasksListView = findViewById(R.id.defaultTasksListView);
+        DefaultTaskAdapter defaultTaskAdapter = new DefaultTaskAdapter(DefaultTasksActivity.this);
         defaultTasksListView.setAdapter(defaultTaskAdapter);
+
+        AsyncTask.execute(() -> {
+            defaultTasks.addAll(db.defaultTaskDao().getAll());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    defaultTaskAdapter.notifyDataSetChanged();
+                }
+            });
+        });
 
         FloatingActionButton defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
         defaultTasksAddButton.setOnClickListener(v -> {
-            this.showBottomPanel(!bottomPanelShown);
+            this.showBottomPanel(true);
         });
 
         View defaultTasksShadow = findViewById(R.id.defaultTasksShadow);
         defaultTasksShadow.setOnClickListener(v -> {
-            this.showBottomPanel(!bottomPanelShown);
+            this.showBottomPanel(false);
+        });
+
+        EditText editTextDefaultTaskTitle = (EditText)findViewById(R.id.editTextDefaultTaskTitle);
+        editTextDefaultTaskTitle.addTextChangedListener(new TextValidator(editTextDefaultTaskTitle) {
+            @Override public void validate(TextView textView, String text) {
+                titleError = false;
+                if(text.length() == 0){
+                    textView.setError(getString(R.string.to_short));
+                    titleError = true;
+                }
+                else if(text.length() > 80){
+                    textView.setError(getString(R.string.to_long));
+                    titleError = true;
+                }
+            }
+        });
+
+        EditText editTextDefaultTaskDuration = (EditText)findViewById(R.id.editTextDefaultTaskDuration);
+        editTextDefaultTaskDuration.addTextChangedListener(new TextValidator(editTextDefaultTaskDuration) {
+            @Override public void validate(TextView textView, String text) {
+                durationError = false;
+                if(text.length() == 0){
+                    textView.setError(getString(R.string.to_short));
+                    durationError = true;
+                }
+                else if(text.length() > 10){
+                    textView.setError(getString(R.string.to_long));
+                    durationError = true;
+                }else if(((!text.matches("\\d+") || Integer.parseInt(text) <= 0) && !text.matches("\\d{1,2}:\\d{2}"))){
+                    textView.setError(getString(R.string.title_must_match));
+                    durationError = true;
+                }
+            }
+        });
+
+        View save = findViewById(R.id.defaultTasksSave);
+
+        save.setOnClickListener(v -> {
+            Editable taskTitleText = editTextDefaultTaskTitle.getText();
+            Editable durationTitleText = editTextDefaultTaskDuration.getText();
+            if(titleError || durationError || taskTitleText.length() == 0 || durationTitleText.length() == 0)
+                Toast.makeText(DefaultTasksActivity.this, R.string.provide_correct_data, Toast.LENGTH_SHORT).show();
+            else{
+                int[] duration = {0, 0};
+                if(durationTitleText.toString().matches("\\d+")) {
+                    int durationToConvert = Integer.parseInt(durationTitleText.toString());
+                    duration[0] = durationToConvert / 60;
+                    duration[1] = durationToConvert - duration[0] * 60;
+                }else{
+                    String[] durationParts = durationTitleText.toString().split(":");
+                    duration[0] = Integer.parseInt(durationParts[0]);
+                    int durationToConvert = Integer.parseInt(durationParts[1]);
+                    duration[0] += durationToConvert / 60;
+                    duration[1] = durationToConvert - ((int)(durationToConvert / 60)) * 60;
+                }
+
+                AsyncTask.execute(() -> {
+                    this.db.defaultTaskDao().insertDefaultTask(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], 0));
+                    defaultTasks.clear();
+                    defaultTasks.addAll(db.defaultTaskDao().getAll());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            defaultTaskAdapter.notifyDataSetChanged();
+                        }
+                    });
+                });
+
+                showBottomPanel(false);
+                Toast.makeText(DefaultTasksActivity.this, R.string.saved, Toast.LENGTH_SHORT).show();
+            }
         });
 
     }
 
     class DefaultTaskAdapter extends ArrayAdapter<DefaultTask>{
         Context context;
-        List<DefaultTask> rTasks = new ArrayList<>();
 
-        DefaultTaskAdapter(Context c, List<DefaultTask> tasks){
-            super(c, R.layout.default_task_row, R.id.default_task_row_title, tasks);
+        DefaultTaskAdapter(Context c){
+            super(c, R.layout.default_task_row, R.id.default_task_row_title, defaultTasks);
             this.context = c;
-            this.rTasks = tasks;
         }
 
         @NonNull
@@ -88,18 +166,18 @@ public class DefaultTasksActivity extends AppCompatActivity {
             LayoutInflater layoutInflater = (LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View row = layoutInflater.inflate(R.layout.default_task_row, parent, false);
             TextView title = row.findViewById(R.id.default_task_row_title);
-            title.setText(rTasks.get(position).getTitle());
+            title.setText(defaultTasks.get(position).getTitle());
             TextView duration = row.findViewById(R.id.default_task_duration_text);
-            duration.setText(String.format("%d:%dh",rTasks.get(position).getDurationHours(), rTasks.get(position).getDurationMinutes()));
+            duration.setText(String.format("%d:%dh",defaultTasks.get(position).getDurationHours(), defaultTasks.get(position).getDurationMinutes()));
 
             ImageButton editDefaultTask = row.findViewById(R.id.default_task_edit_icon);
             editDefaultTask.setOnClickListener(v -> {
-                Toast.makeText(DefaultTasksActivity.this, rTasks.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(DefaultTasksActivity.this, defaultTasks.get(position).getTitle(), Toast.LENGTH_SHORT).show();
             });
 
             ImageButton deleteDefaultTask = row.findViewById(R.id.default_task_delete_icon);
             deleteDefaultTask.setOnClickListener(v -> {
-                Toast.makeText(DefaultTasksActivity.this, rTasks.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(DefaultTasksActivity.this, defaultTasks.get(position).getTitle(), Toast.LENGTH_SHORT).show();
             });
 
             return row;
@@ -107,7 +185,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
     }
 
     private void showBottomPanel(boolean show) {
-        bottomPanelShown = !bottomPanelShown;
+        bottomPanelShown = show;
         View defaultTasksBottomPanel = findViewById(R.id.defaultTasksBottomPanel);
         ViewGroup parent = findViewById(R.id.defaultTasksParent);
 
@@ -123,14 +201,26 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
         View defaultTasksShadow = findViewById(R.id.defaultTasksShadow);
         defaultTasksShadow.setVisibility(show ? View.VISIBLE : View.GONE);
+
+        if(!show)
+            closeKeyboard();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && bottomPanelShown) {
-            this.showBottomPanel(!bottomPanelShown);
+            this.showBottomPanel(false);
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
+
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
 }

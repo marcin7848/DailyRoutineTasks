@@ -24,4 +24,14 @@
 
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="add_new_default_task">Add new default task</string>
+    <string name="title">Title</string>
+    <string name="duration">Duration (min)</string>
+    <string name="to_short">To short!</string>
+    <string name="to_long">To long!</string>
+    <string name="title_must_match">Title must be a number of minutes (e.g. 30) or contain hour and
+        minute in format: h:m (e.g. 1:30)</string>
+    <string name="save">Save</string>
+    <string name="provide_correct_data">You need to provide correct data to all fields!</string>
+    <string name="saved">Saved!</string>
 </resources>

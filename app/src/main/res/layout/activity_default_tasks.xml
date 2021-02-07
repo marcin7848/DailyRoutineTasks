@@ -50,10 +50,42 @@
         android:background="@color/white"
         android:orientation="vertical"
         android:layout_gravity="bottom|end"
-        android:visibility="visible"
-        android:clickable="true">
+        android:visibility="gone"
+        android:clickable="true"
+        android:padding="10dp">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_new_default_task"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
 
+        <EditText
+            android:id="@+id/editTextDefaultTaskTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="15"
+            android:text=""
+            android:autofillHints=""
+            android:hint="@string/title"/>
+
+        <EditText
+            android:id="@+id/editTextDefaultTaskDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="8"
+            android:text=""
+            android:autofillHints=""
+            android:hint="@string/duration"/>
+
+        <Button
+            android:id="@+id/defaultTasksSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:backgroundTint="@color/design_default_color_primary"
+            android:layout_gravity="end" />
 
     </LinearLayout>
 
