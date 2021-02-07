@@ -21,4 +21,7 @@
     <string name="settings">Settings</string>
     <string name="defaultTasks">Default Tasks</string>
     <string name="habits">Habits</string>
+
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>

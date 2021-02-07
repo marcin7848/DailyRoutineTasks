@@ -39,12 +39,11 @@ public class MainActivity extends AppCompatActivity {
             updateDays(db);
         });
 
-        Context context = this;
         Spinner spinnerDay = (Spinner) findViewById(R.id.spinnerDay);
         spinnerDay.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(context, parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
