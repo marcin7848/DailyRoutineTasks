@@ -4,20 +4,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dailyroutinetasks.database.entities.DefaultTask;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +36,8 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
     ListView defaultTasksListView;
     List<DefaultTask> tasks = new ArrayList<>();;
+
+    boolean test = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +53,28 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
         tasks.add(new DefaultTask("Title1", 1, 34, 1));
         tasks.add(new DefaultTask("Title2", 2, 11, 2));
+        tasks.add(new DefaultTask("Title2", 2, 11, 2));
+        tasks.add(new DefaultTask("Title2", 2, 11, 2));
+        tasks.add(new DefaultTask("Title2", 2, 11, 2));
+        tasks.add(new DefaultTask("Title2", 2, 11, 2));
+        tasks.add(new DefaultTask("Title2", 2, 11, 2));
+        tasks.add(new DefaultTask("Title2", 2, 11, 2));
+        tasks.add(new DefaultTask("Title2", 2, 11, 2));
+        tasks.add(new DefaultTask("Title3", 2, 11, 2));
+        tasks.add(new DefaultTask("Title4", 2, 11, 2));
 
         DefaultTaskAdapter defaultTaskAdapter = new DefaultTaskAdapter(this, tasks);
         defaultTasksListView.setAdapter(defaultTaskAdapter);
+
+        FloatingActionButton defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
+        defaultTasksAddButton.setOnClickListener(v -> {
+            this.toggle(!test);
+        });
+
+        View defaultTasksShadow = findViewById(R.id.defaultTasksShadow);
+        defaultTasksShadow.setOnClickListener(v -> {
+            this.toggle(!test);
+        });
 
     }
 
@@ -79,5 +110,33 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
             return row;
         }
+    }
+
+    private void toggle(boolean show) {
+        test = !test;
+        View defaultTasksBottomPanel = findViewById(R.id.defaultTasksBottomPanel);
+        ViewGroup parent = findViewById(R.id.defaultTasksParent);
+
+        Transition transition = new Slide(Gravity.BOTTOM);
+        transition.setDuration(600);
+        transition.addTarget(R.id.defaultTasksBottomPanel);
+
+        TransitionManager.beginDelayedTransition(parent, transition);
+        defaultTasksBottomPanel.setVisibility(show ? View.VISIBLE : View.GONE);
+
+        View defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
+        defaultTasksAddButton.setVisibility(show ? View.GONE : View.VISIBLE);
+
+        View defaultTasksShadow = findViewById(R.id.defaultTasksShadow);
+        defaultTasksShadow.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && test) {
+            this.toggle(!test);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
