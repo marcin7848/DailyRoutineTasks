@@ -136,8 +136,13 @@ public class DefaultTasksActivity extends AppCompatActivity {
                 int position = editPosition;
                 AsyncTask.execute(() -> {
                     if(position == -1) {
-                        long newId = this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], 0));
-                        defaultTasks.add(new DefaultTask(newId, taskTitleText.toString(), duration[0], duration[1], 0));
+                        DefaultTask defaultTaskWithLastPositionNumber = this.db.defaultTaskDao().getDefaultTaskWithLastPositionNumber();
+                        int newLastPosition = 0;
+                        if(defaultTaskWithLastPositionNumber != null)
+                            newLastPosition = defaultTaskWithLastPositionNumber.getPositionNumber() + 1;
+
+                        long newId = this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], newLastPosition));
+                        defaultTasks.add(new DefaultTask(newId, taskTitleText.toString(), duration[0], duration[1], newLastPosition));
                         runOnUiThread(() -> defaultTaskAdapter.notifyItemInserted(defaultTasks.size()-1));
                     }
                     else{
@@ -175,7 +180,8 @@ public class DefaultTasksActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull DefaultTaskViewHolder holder, int position) {
             holder.title.setText(defaultTasks.get(position).getTitle());
             String minutes = defaultTasks.get(position).getDurationMinutes() < 10 ? "0" + defaultTasks.get(position).getDurationMinutes() : "" + defaultTasks.get(position).getDurationMinutes();
-            holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
+            //holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
+            holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), defaultTasks.get(position).getPositionNumber().toString()));
 
             holder.editDefaultTask.setOnClickListener(v -> {
                 editPosition = position;
@@ -262,5 +268,6 @@ public class DefaultTasksActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
 
 }

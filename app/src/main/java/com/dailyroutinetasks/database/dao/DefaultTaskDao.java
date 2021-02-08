@@ -11,19 +11,15 @@ import com.dailyroutinetasks.database.entities.DefaultTask;
 import java.util.List;
 
 @Dao
-public interface DefaultTaskDao {
+public interface DefaultTaskDao extends TaskGenericDao<DefaultTask>{
+
     @Query("SELECT * FROM defaulttask ORDER BY position_number ASC")
     List<DefaultTask> getAll();
 
     @Query("SELECT * FROM defaulttask WHERE id IN (:ids)")
     List<DefaultTask> loadAllByIds(int[] ids);
 
-    @Insert
-    long insert(DefaultTask defaultTask);
+    @Query("SELECT * FROM defaulttask ORDER BY position_number DESC LIMIT 1")
+    DefaultTask getDefaultTaskWithLastPositionNumber();
 
-    @Delete
-    void delete(DefaultTask defaultTask);
-
-    @Update
-    void update(DefaultTask defaultTask);
 }
