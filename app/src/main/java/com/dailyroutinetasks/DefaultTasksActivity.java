@@ -1,7 +1,6 @@
 package com.dailyroutinetasks;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -16,17 +15,14 @@ import android.text.Editable;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,9 +42,9 @@ public class DefaultTasksActivity extends AppCompatActivity {
     boolean durationError = false;
     AppDatabase db;
     List<DefaultTask> defaultTasks = new ArrayList<>();
-    DefaultTaskAdapter defaultTaskAdapter;
+    DefaultTaskRecyclerAdapter defaultTaskRecyclerAdapter;
     int editPosition = -1;
-    RecyclerView defaultTasksListView;
+    RecyclerView defaultTasksRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +59,17 @@ public class DefaultTasksActivity extends AppCompatActivity {
         this.db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "dailyRoutineTasksDb").build();
 
-        defaultTasksListView = findViewById(R.id.defaultTasksListView);
-        defaultTaskAdapter = new DefaultTaskAdapter(DefaultTasksActivity.this);
-        defaultTasksListView.setLayoutManager(new LinearLayoutManager(this));
-        defaultTasksListView.setAdapter(defaultTaskAdapter);
+        defaultTasksRecyclerView = findViewById(R.id.defaultTasksRecyclerView);
+        defaultTaskRecyclerAdapter = new DefaultTaskRecyclerAdapter(DefaultTasksActivity.this);
+        defaultTasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        defaultTasksRecyclerView.setAdapter(defaultTaskRecyclerAdapter);
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(defaultTaskMoveCallback);
-        itemTouchHelper.attachToRecyclerView(defaultTasksListView);
+        itemTouchHelper.attachToRecyclerView(defaultTasksRecyclerView);
 
         AsyncTask.execute(() -> {
             defaultTasks.addAll(db.defaultTaskDao().getAll());
-            runOnUiThread(() -> defaultTaskAdapter.notifyDataSetChanged());
+            runOnUiThread(() -> defaultTaskRecyclerAdapter.notifyDataSetChanged());
         });
 
         FloatingActionButton defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
@@ -142,25 +138,27 @@ public class DefaultTasksActivity extends AppCompatActivity {
                 }
 
                 int position = editPosition;
-                AsyncTask.execute(() -> {
-                    if(position == -1) {
+
+                if (position == -1) {
+                    AsyncTask.execute(() -> {
                         DefaultTask defaultTaskWithLastPositionNumber = this.db.defaultTaskDao().getDefaultTaskWithLastPositionNumber();
                         int newLastPosition = 0;
-                        if(defaultTaskWithLastPositionNumber != null)
+                        if (defaultTaskWithLastPositionNumber != null)
                             newLastPosition = defaultTaskWithLastPositionNumber.getPositionNumber() + 1;
 
                         long newId = this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], newLastPosition));
                         defaultTasks.add(new DefaultTask(newId, taskTitleText.toString(), duration[0], duration[1], newLastPosition));
-                        runOnUiThread(() -> defaultTaskAdapter.notifyItemInserted(defaultTasks.size()-1));
-                    }
-                    else{
-                        defaultTasks.get(position).setTitle(taskTitleText.toString());
-                        defaultTasks.get(position).setDurationHours(duration[0]);
-                        defaultTasks.get(position).setDurationMinutes(duration[1]);
+                        runOnUiThread(() -> defaultTaskRecyclerAdapter.notifyItemInserted(defaultTasks.size() - 1));
+                    });
+                } else {
+                    defaultTasks.get(position).setTitle(taskTitleText.toString());
+                    defaultTasks.get(position).setDurationHours(duration[0]);
+                    defaultTasks.get(position).setDurationMinutes(duration[1]);
+                    AsyncTask.execute(() -> {
                         this.db.defaultTaskDao().update(defaultTasks.get(position));
-                        runOnUiThread(() -> defaultTaskAdapter.notifyItemChanged(position));
-                    }
-                });
+                    });
+                    defaultTaskRecyclerAdapter.notifyItemChanged(position);
+                }
 
                 showBottomPanel(false);
                 Toast.makeText(DefaultTasksActivity.this, R.string.saved, Toast.LENGTH_SHORT).show();
@@ -169,10 +167,10 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
     }
 
-    class DefaultTaskAdapter extends RecyclerView.Adapter<DefaultTaskAdapter.DefaultTaskViewHolder> {
+    class DefaultTaskRecyclerAdapter extends RecyclerView.Adapter<DefaultTaskRecyclerAdapter.DefaultTaskViewHolder> {
         Context context;
 
-        public DefaultTaskAdapter(Context c){
+        public DefaultTaskRecyclerAdapter(Context c) {
             this.context = c;
         }
 
@@ -191,28 +189,11 @@ public class DefaultTasksActivity extends AppCompatActivity {
             //holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
             holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), defaultTasks.get(position).getPositionNumber().toString()));
 
-            holder.editDefaultTask.setOnClickListener(v -> {
+            holder.itemView.setOnClickListener(v -> {
                 editPosition = position;
                 showBottomPanel(true);
             });
 
-            holder.deleteDefaultTask.setOnClickListener(v -> {
-                AsyncTask.execute(() -> {
-                    db.defaultTaskDao().delete(defaultTasks.get(position));
-                    defaultTasks.remove(position);
-                    int[] pos = {0};
-                    defaultTasks.forEach(dt -> {
-                        dt.setPositionNumber(pos[0]++);
-                    });
-                    db.defaultTaskDao().updateAll(defaultTasks);
-                    runOnUiThread(() -> {
-                        defaultTaskAdapter.notifyItemRemoved(position);
-                        defaultTaskAdapter.notifyItemRangeChanged(position, defaultTasks.size());
-                    });
-                });
-
-                Toast.makeText(DefaultTasksActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();
-            });
         }
 
         @Override
@@ -285,15 +266,21 @@ public class DefaultTasksActivity extends AppCompatActivity {
         }
     }
 
-    ItemTouchHelper.SimpleCallback defaultTaskMoveCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
+    ItemTouchHelper.SimpleCallback defaultTaskMoveCallback = new ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT,
+            ItemTouchHelper.LEFT) {
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            int fromPosition = viewHolder.getAdapterPosition();
-            int toPosition = target.getAdapterPosition();
-
+            final int fromPosition = viewHolder.getAdapterPosition();
+            final int toPosition = target.getAdapterPosition();
             DefaultTask defaultTask1 = defaultTasks.get(fromPosition);
-            defaultTask1.setPositionNumber(toPosition);
             DefaultTask defaultTask2 = defaultTasks.get(toPosition);
+
+            Collections.swap(defaultTasks, fromPosition, toPosition);
+            recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
+            recyclerView.getAdapter().notifyItemRangeChanged(Math.min(fromPosition, toPosition), Math.max(fromPosition, toPosition));
+
+            defaultTask1.setPositionNumber(toPosition);
             defaultTask2.setPositionNumber(fromPosition);
             List<DefaultTask> updateDefaultTasks = Arrays.asList(defaultTask1, defaultTask2);
 
@@ -301,17 +288,31 @@ public class DefaultTasksActivity extends AppCompatActivity {
                 db.defaultTaskDao().updateAll(updateDefaultTasks);
             });
 
-            Collections.swap(defaultTasks, fromPosition, toPosition);
-
-            recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
-
             return false;
         }
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            final int position = viewHolder.getAdapterPosition();
+            if (direction == ItemTouchHelper.LEFT) {
+                DefaultTask removedDefaultTask = new DefaultTask(defaultTasks.get(position));
+                defaultTasks.remove(position);
+                defaultTaskRecyclerAdapter.notifyItemRemoved(position);
+                defaultTaskRecyclerAdapter.notifyItemRangeChanged(position, defaultTasks.size() - position);
 
+                AsyncTask.execute(() -> {
+                    db.defaultTaskDao().delete(removedDefaultTask);
+                    int[] pos = {0};
+                    defaultTasks.forEach(dt -> {
+                        dt.setPositionNumber(pos[0]++);
+                    });
+                    db.defaultTaskDao().updateAll(defaultTasks);
+                });
+
+                Toast.makeText(DefaultTasksActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();
+            }
         }
+
     };
 
 

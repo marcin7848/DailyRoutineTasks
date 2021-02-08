@@ -27,6 +27,12 @@ public class DefaultTask extends BaseTask {
         super(title, durationHours, durationMinutes, positionNumber);
     }
 
+    @Ignore
+    public DefaultTask(DefaultTask defaultTask) {
+        super(defaultTask.title, defaultTask.durationHours, defaultTask.durationMinutes, defaultTask.positionNumber);
+        this.id = defaultTask.id;
+    }
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     private Long id;
