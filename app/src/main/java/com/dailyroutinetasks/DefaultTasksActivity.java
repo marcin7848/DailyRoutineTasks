@@ -192,7 +192,15 @@ public class DefaultTasksActivity extends AppCompatActivity {
                 AsyncTask.execute(() -> {
                     db.defaultTaskDao().delete(defaultTasks.get(position));
                     defaultTasks.remove(position);
-                    runOnUiThread(() -> defaultTaskAdapter.notifyItemRemoved(position));
+                    int[] pos = {0};
+                    defaultTasks.forEach(dt -> {
+                        dt.setPositionNumber(pos[0]++);
+                    });
+                    db.defaultTaskDao().updateAll(defaultTasks);
+                    runOnUiThread(() -> {
+                        defaultTaskAdapter.notifyItemRemoved(position);
+                        defaultTaskAdapter.notifyItemRangeChanged(position, defaultTasks.size());
+                    });
                 });
 
                 Toast.makeText(DefaultTasksActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();

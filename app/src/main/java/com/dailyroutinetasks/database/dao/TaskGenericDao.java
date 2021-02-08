@@ -6,6 +6,8 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Update;
 
+import java.util.List;
+
 @Dao
 public  interface TaskGenericDao<T>{
 
@@ -17,4 +19,8 @@ public  interface TaskGenericDao<T>{
 
     @Update
     void update(T t);
+
+    @Update
+    void updateAll(List<T> t);
+
 }
