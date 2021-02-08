@@ -13,40 +13,22 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity
-public class DefaultTask {
+@Entity(inheritSuperIndices = true)
+public class DefaultTask extends BaseTask {
 
     @Ignore
-    public DefaultTask(Long id, String title, Integer durationHours, Integer durationMinutes, Integer orderNumber) {
+    public DefaultTask(Long id, String title, Integer durationHours, Integer durationMinutes, Integer positionNumber) {
+        super(title, durationHours, durationMinutes, positionNumber);
         this.id = id;
-        this.title = title;
-        this.durationHours = durationHours;
-        this.durationMinutes = durationMinutes;
-        this.orderNumber = orderNumber;
     }
 
     @Ignore
-    public DefaultTask(String title, Integer durationHours, Integer durationMinutes, Integer orderNumber) {
-        this.title = title;
-        this.durationHours = durationHours;
-        this.durationMinutes = durationMinutes;
-        this.orderNumber = orderNumber;
+    public DefaultTask(String title, Integer durationHours, Integer durationMinutes, Integer positionNumber) {
+        super(title, durationHours, durationMinutes, positionNumber);
     }
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     private Long id;
-
-    @ColumnInfo(name = "title")
-    private String title;
-
-    @ColumnInfo(name = "duration_hours")
-    private Integer durationHours;
-
-    @ColumnInfo(name = "duration_minutes")
-    private Integer durationMinutes;
-
-    @ColumnInfo(name = "order_number")
-    private Integer orderNumber;
 
 }

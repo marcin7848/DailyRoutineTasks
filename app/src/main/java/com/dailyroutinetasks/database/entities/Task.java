@@ -38,8 +38,8 @@ public class Task {
     @ColumnInfo(name = "duration_minutes")
     private Integer durationMinutes;
 
-    @ColumnInfo(name = "order_number")
-    private Integer orderNumber;
+    @ColumnInfo(name = "position_number", index = true)
+    private Integer positionNumber;
 
     @ColumnInfo(name = "day_id", index = true)
     private Long dayId;

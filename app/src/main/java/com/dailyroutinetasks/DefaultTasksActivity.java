@@ -65,12 +65,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
         AsyncTask.execute(() -> {
             defaultTasks.addAll(db.defaultTaskDao().getAll());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    defaultTaskAdapter.notifyDataSetChanged();
-                }
-            });
+            runOnUiThread(() -> defaultTaskAdapter.notifyDataSetChanged());
         });
 
         FloatingActionButton defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
@@ -143,24 +138,14 @@ public class DefaultTasksActivity extends AppCompatActivity {
                     if(position == -1) {
                         long newId = this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], 0));
                         defaultTasks.add(new DefaultTask(newId, taskTitleText.toString(), duration[0], duration[1], 0));
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                defaultTaskAdapter.notifyItemInserted(defaultTasks.size()-1);
-                            }
-                        });
+                        runOnUiThread(() -> defaultTaskAdapter.notifyItemInserted(defaultTasks.size()-1));
                     }
                     else{
                         defaultTasks.get(position).setTitle(taskTitleText.toString());
                         defaultTasks.get(position).setDurationHours(duration[0]);
                         defaultTasks.get(position).setDurationMinutes(duration[1]);
                         this.db.defaultTaskDao().update(defaultTasks.get(position));
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                defaultTaskAdapter.notifyItemChanged(position);
-                            }
-                        });
+                        runOnUiThread(() -> defaultTaskAdapter.notifyItemChanged(position));
                     }
                 });
 
@@ -201,12 +186,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
                 AsyncTask.execute(() -> {
                     db.defaultTaskDao().delete(defaultTasks.get(position));
                     defaultTasks.remove(position);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            defaultTaskAdapter.notifyItemRemoved(position);
-                        }
-                    });
+                    runOnUiThread(() -> defaultTaskAdapter.notifyItemRemoved(position));
                 });
 
                 Toast.makeText(DefaultTasksActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();

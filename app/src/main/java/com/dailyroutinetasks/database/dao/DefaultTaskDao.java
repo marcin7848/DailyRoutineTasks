@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public interface DefaultTaskDao {
-    @Query("SELECT * FROM defaulttask")
+    @Query("SELECT * FROM defaulttask ORDER BY position_number ASC")
     List<DefaultTask> getAll();
 
     @Query("SELECT * FROM defaulttask WHERE id IN (:ids)")
