@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.content.Context;
@@ -56,9 +58,10 @@ public class DefaultTasksActivity extends AppCompatActivity {
         this.db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "dailyRoutineTasksDb").build();
 
-        ListView defaultTasksListView = findViewById(R.id.defaultTasksListView);
+        RecyclerView defaultTasksListView = findViewById(R.id.defaultTasksListView);
         defaultTaskAdapter = new DefaultTaskAdapter(DefaultTasksActivity.this);
         defaultTasksListView.setAdapter(defaultTaskAdapter);
+        defaultTasksListView.setLayoutManager(new LinearLayoutManager(this));
 
         AsyncTask.execute(() -> {
             defaultTasks.addAll(db.defaultTaskDao().getAll());
@@ -135,23 +138,30 @@ public class DefaultTasksActivity extends AppCompatActivity {
                     duration[1] = durationToConvert - ((int) (durationToConvert / 60)) * 60;
                 }
 
+                int position = editPosition;
                 AsyncTask.execute(() -> {
-                    if(editPosition == -1) {
+                    if(position == -1) {
                         long newId = this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], 0));
                         defaultTasks.add(new DefaultTask(newId, taskTitleText.toString(), duration[0], duration[1], 0));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                defaultTaskAdapter.notifyItemInserted(defaultTasks.size()-1);
+                            }
+                        });
                     }
                     else{
-                        defaultTasks.get(editPosition).setTitle(taskTitleText.toString());
-                        defaultTasks.get(editPosition).setDurationHours(duration[0]);
-                        defaultTasks.get(editPosition).setDurationMinutes(duration[1]);
-                        this.db.defaultTaskDao().update(defaultTasks.get(editPosition));
+                        defaultTasks.get(position).setTitle(taskTitleText.toString());
+                        defaultTasks.get(position).setDurationHours(duration[0]);
+                        defaultTasks.get(position).setDurationMinutes(duration[1]);
+                        this.db.defaultTaskDao().update(defaultTasks.get(position));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                defaultTaskAdapter.notifyItemChanged(position);
+                            }
+                        });
                     }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            defaultTaskAdapter.notifyDataSetChanged();
-                        }
-                    });
                 });
 
                 showBottomPanel(false);
@@ -161,48 +171,64 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
     }
 
-    class DefaultTaskAdapter extends ArrayAdapter<DefaultTask> {
+    class DefaultTaskAdapter extends RecyclerView.Adapter<DefaultTaskAdapter.DefaultTaskViewHolder> {
         Context context;
 
-        DefaultTaskAdapter(Context c) {
-            super(c, R.layout.default_task_row, R.id.default_task_row_title, defaultTasks);
+        public DefaultTaskAdapter(Context c){
             this.context = c;
         }
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            LayoutInflater layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View row = layoutInflater.inflate(R.layout.default_task_row, parent, false);
-            TextView title = row.findViewById(R.id.default_task_row_title);
-            title.setText(defaultTasks.get(position).getTitle());
-            TextView duration = row.findViewById(R.id.default_task_duration_text);
-            String minutes = defaultTasks.get(position).getDurationMinutes() < 10 ? "0" + defaultTasks.get(position).getDurationMinutes() : "" + defaultTasks.get(position).getDurationMinutes();
-            duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
+        public DefaultTaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View view = inflater.inflate(R.layout.default_task_row, parent, false);
+            return new DefaultTaskViewHolder(view);
+        }
 
-            ImageButton editDefaultTask = row.findViewById(R.id.default_task_edit_icon);
-            editDefaultTask.setOnClickListener(v -> {
+        @Override
+        public void onBindViewHolder(@NonNull DefaultTaskViewHolder holder, int position) {
+            holder.title.setText(defaultTasks.get(position).getTitle());
+            String minutes = defaultTasks.get(position).getDurationMinutes() < 10 ? "0" + defaultTasks.get(position).getDurationMinutes() : "" + defaultTasks.get(position).getDurationMinutes();
+            holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
+
+            holder.editDefaultTask.setOnClickListener(v -> {
                 editPosition = position;
                 showBottomPanel(true);
             });
 
-            ImageButton deleteDefaultTask = row.findViewById(R.id.default_task_delete_icon);
-            deleteDefaultTask.setOnClickListener(v -> {
+            holder.deleteDefaultTask.setOnClickListener(v -> {
                 AsyncTask.execute(() -> {
                     db.defaultTaskDao().delete(defaultTasks.get(position));
                     defaultTasks.remove(position);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            defaultTaskAdapter.notifyDataSetChanged();
+                            defaultTaskAdapter.notifyItemRemoved(position);
                         }
                     });
                 });
 
                 Toast.makeText(DefaultTasksActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();
             });
+        }
 
-            return row;
+        @Override
+        public int getItemCount() {
+            return defaultTasks.size();
+        }
+
+        public class DefaultTaskViewHolder extends RecyclerView.ViewHolder{
+            TextView title, duration;
+            ImageButton editDefaultTask, deleteDefaultTask;
+
+            public DefaultTaskViewHolder(@NonNull View itemView) {
+                super(itemView);
+                title = itemView.findViewById(R.id.default_task_row_title);
+                duration = itemView.findViewById(R.id.default_task_duration_text);
+                editDefaultTask = itemView.findViewById(R.id.default_task_edit_icon);
+                deleteDefaultTask = itemView.findViewById(R.id.default_task_delete_icon);
+            }
         }
     }
 
