@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -15,6 +16,7 @@ import android.text.Editable;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -33,6 +35,8 @@ import com.dailyroutinetasks.database.entities.DefaultTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class DefaultTasksActivity extends AppCompatActivity {
@@ -42,8 +46,9 @@ public class DefaultTasksActivity extends AppCompatActivity {
     boolean durationError = false;
     AppDatabase db;
     List<DefaultTask> defaultTasks = new ArrayList<>();
-    DefaultTaskAdapter defaultTaskAdapter = null;
+    DefaultTaskAdapter defaultTaskAdapter;
     int editPosition = -1;
+    RecyclerView defaultTasksListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +63,13 @@ public class DefaultTasksActivity extends AppCompatActivity {
         this.db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "dailyRoutineTasksDb").build();
 
-        RecyclerView defaultTasksListView = findViewById(R.id.defaultTasksListView);
+        defaultTasksListView = findViewById(R.id.defaultTasksListView);
         defaultTaskAdapter = new DefaultTaskAdapter(DefaultTasksActivity.this);
-        defaultTasksListView.setAdapter(defaultTaskAdapter);
         defaultTasksListView.setLayoutManager(new LinearLayoutManager(this));
+        defaultTasksListView.setAdapter(defaultTaskAdapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(defaultTaskMoveCallback);
+        itemTouchHelper.attachToRecyclerView(defaultTasksListView);
 
         AsyncTask.execute(() -> {
             defaultTasks.addAll(db.defaultTaskDao().getAll());
@@ -212,7 +220,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
             return defaultTasks.size();
         }
 
-        public class DefaultTaskViewHolder extends RecyclerView.ViewHolder{
+        public class DefaultTaskViewHolder extends RecyclerView.ViewHolder {
             TextView title, duration;
             ImageButton editDefaultTask, deleteDefaultTask;
 
@@ -276,6 +284,35 @@ public class DefaultTasksActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+    ItemTouchHelper.SimpleCallback defaultTaskMoveCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+
+            DefaultTask defaultTask1 = defaultTasks.get(fromPosition);
+            defaultTask1.setPositionNumber(toPosition);
+            DefaultTask defaultTask2 = defaultTasks.get(toPosition);
+            defaultTask2.setPositionNumber(fromPosition);
+            List<DefaultTask> updateDefaultTasks = Arrays.asList(defaultTask1, defaultTask2);
+
+            AsyncTask.execute(() -> {
+                db.defaultTaskDao().updateAll(updateDefaultTasks);
+            });
+
+            Collections.swap(defaultTasks, fromPosition, toPosition);
+
+            recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
+
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+    };
 
 
 }
