@@ -41,6 +41,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
     AppDatabase db;
     List<DefaultTask> defaultTasks = new ArrayList<>();
     DefaultTaskAdapter defaultTaskAdapter = null;
+    int editPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
         FloatingActionButton defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
         defaultTasksAddButton.setOnClickListener(v -> {
+            editPosition = -1;
             this.showBottomPanel(true);
         });
 
@@ -79,33 +81,33 @@ public class DefaultTasksActivity extends AppCompatActivity {
             this.showBottomPanel(false);
         });
 
-        EditText editTextDefaultTaskTitle = (EditText)findViewById(R.id.editTextDefaultTaskTitle);
+        EditText editTextDefaultTaskTitle = (EditText) findViewById(R.id.editTextDefaultTaskTitle);
         editTextDefaultTaskTitle.addTextChangedListener(new TextValidator(editTextDefaultTaskTitle) {
-            @Override public void validate(TextView textView, String text) {
+            @Override
+            public void validate(TextView textView, String text) {
                 titleError = false;
-                if(text.length() == 0){
+                if (text.length() == 0) {
                     textView.setError(getString(R.string.to_short));
                     titleError = true;
-                }
-                else if(text.length() > 80){
+                } else if (text.length() > 80) {
                     textView.setError(getString(R.string.to_long));
                     titleError = true;
                 }
             }
         });
 
-        EditText editTextDefaultTaskDuration = (EditText)findViewById(R.id.editTextDefaultTaskDuration);
+        EditText editTextDefaultTaskDuration = (EditText) findViewById(R.id.editTextDefaultTaskDuration);
         editTextDefaultTaskDuration.addTextChangedListener(new TextValidator(editTextDefaultTaskDuration) {
-            @Override public void validate(TextView textView, String text) {
+            @Override
+            public void validate(TextView textView, String text) {
                 durationError = false;
-                if(text.length() == 0){
+                if (text.length() == 0) {
                     textView.setError(getString(R.string.to_short));
                     durationError = true;
-                }
-                else if(text.length() > 10){
+                } else if (text.length() > 10) {
                     textView.setError(getString(R.string.to_long));
                     durationError = true;
-                }else if(((!text.matches("\\d+") || Integer.parseInt(text) <= 0) && !text.matches("\\d{1,2}:\\d{2}"))){
+                } else if (((!text.matches("\\d+") || Integer.parseInt(text) <= 0) && !text.matches("\\d{1,2}:\\d{2}"))) {
                     textView.setError(getString(R.string.title_must_match));
                     durationError = true;
                 }
@@ -117,26 +119,33 @@ public class DefaultTasksActivity extends AppCompatActivity {
         save.setOnClickListener(v -> {
             Editable taskTitleText = editTextDefaultTaskTitle.getText();
             Editable durationTitleText = editTextDefaultTaskDuration.getText();
-            if(titleError || durationError || taskTitleText.length() == 0 || durationTitleText.length() == 0)
+            if (titleError || durationError || taskTitleText.length() == 0 || durationTitleText.length() == 0)
                 Toast.makeText(DefaultTasksActivity.this, R.string.provide_correct_data, Toast.LENGTH_SHORT).show();
-            else{
+            else {
                 int[] duration = {0, 0};
-                if(durationTitleText.toString().matches("\\d+")) {
+                if (durationTitleText.toString().matches("\\d+")) {
                     int durationToConvert = Integer.parseInt(durationTitleText.toString());
                     duration[0] = durationToConvert / 60;
                     duration[1] = durationToConvert - duration[0] * 60;
-                }else{
+                } else {
                     String[] durationParts = durationTitleText.toString().split(":");
                     duration[0] = Integer.parseInt(durationParts[0]);
                     int durationToConvert = Integer.parseInt(durationParts[1]);
                     duration[0] += durationToConvert / 60;
-                    duration[1] = durationToConvert - ((int)(durationToConvert / 60)) * 60;
+                    duration[1] = durationToConvert - ((int) (durationToConvert / 60)) * 60;
                 }
 
                 AsyncTask.execute(() -> {
-                    this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], 0));
-                    defaultTasks.clear();
-                    defaultTasks.addAll(db.defaultTaskDao().getAll());
+                    if(editPosition == -1) {
+                        long newId = this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], 0));
+                        defaultTasks.add(new DefaultTask(newId, taskTitleText.toString(), duration[0], duration[1], 0));
+                    }
+                    else{
+                        defaultTasks.get(editPosition).setTitle(taskTitleText.toString());
+                        defaultTasks.get(editPosition).setDurationHours(duration[0]);
+                        defaultTasks.get(editPosition).setDurationMinutes(duration[1]);
+                        this.db.defaultTaskDao().update(defaultTasks.get(editPosition));
+                    }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -152,10 +161,10 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
     }
 
-    class DefaultTaskAdapter extends ArrayAdapter<DefaultTask>{
+    class DefaultTaskAdapter extends ArrayAdapter<DefaultTask> {
         Context context;
 
-        DefaultTaskAdapter(Context c){
+        DefaultTaskAdapter(Context c) {
             super(c, R.layout.default_task_row, R.id.default_task_row_title, defaultTasks);
             this.context = c;
         }
@@ -163,16 +172,18 @@ public class DefaultTasksActivity extends AppCompatActivity {
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            LayoutInflater layoutInflater = (LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View row = layoutInflater.inflate(R.layout.default_task_row, parent, false);
             TextView title = row.findViewById(R.id.default_task_row_title);
             title.setText(defaultTasks.get(position).getTitle());
             TextView duration = row.findViewById(R.id.default_task_duration_text);
-            duration.setText(String.format("%d:%dh",defaultTasks.get(position).getDurationHours(), defaultTasks.get(position).getDurationMinutes()));
+            String minutes = defaultTasks.get(position).getDurationMinutes() < 10 ? "0" + defaultTasks.get(position).getDurationMinutes() : "" + defaultTasks.get(position).getDurationMinutes();
+            duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
 
             ImageButton editDefaultTask = row.findViewById(R.id.default_task_edit_icon);
             editDefaultTask.setOnClickListener(v -> {
-                Toast.makeText(DefaultTasksActivity.this, defaultTasks.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+                editPosition = position;
+                showBottomPanel(true);
             });
 
             ImageButton deleteDefaultTask = row.findViewById(R.id.default_task_delete_icon);
@@ -213,8 +224,20 @@ public class DefaultTasksActivity extends AppCompatActivity {
         View defaultTasksShadow = findViewById(R.id.defaultTasksShadow);
         defaultTasksShadow.setVisibility(show ? View.VISIBLE : View.GONE);
 
-        if(!show)
+        if (!show) {
+            editPosition = -1;
             closeKeyboard();
+        } else if (editPosition != -1) {
+            EditText editTextDefaultTaskTitle = findViewById(R.id.editTextDefaultTaskTitle);
+            EditText editTextDefaultTaskDuration = findViewById(R.id.editTextDefaultTaskDuration);
+            editTextDefaultTaskTitle.setText(defaultTasks.get(editPosition).getTitle());
+            String minutes = defaultTasks.get(editPosition).getDurationMinutes() < 10 ? "0" +
+                    defaultTasks.get(editPosition).getDurationMinutes() : "" +
+                    defaultTasks.get(editPosition).getDurationMinutes();
+
+            editTextDefaultTaskDuration.setText(String.format("%d:%s", defaultTasks.get(editPosition).getDurationHours(), minutes));
+        }
+
     }
 
     @Override

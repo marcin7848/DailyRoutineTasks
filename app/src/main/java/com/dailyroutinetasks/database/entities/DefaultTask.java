@@ -17,6 +17,15 @@ import lombok.Setter;
 public class DefaultTask {
 
     @Ignore
+    public DefaultTask(Long id, String title, Integer durationHours, Integer durationMinutes, Integer orderNumber) {
+        this.id = id;
+        this.title = title;
+        this.durationHours = durationHours;
+        this.durationMinutes = durationMinutes;
+        this.orderNumber = orderNumber;
+    }
+
+    @Ignore
     public DefaultTask(String title, Integer durationHours, Integer durationMinutes, Integer orderNumber) {
         this.title = title;
         this.durationHours = durationHours;
