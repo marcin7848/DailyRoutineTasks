@@ -4,7 +4,7 @@ import androidx.room.TypeConverter;
 
 import java.util.Calendar;
 
-public class Converters {
+public abstract class Converters {
     @TypeConverter
     public static Calendar toCalendar(Long time) {
         Calendar c = Calendar.getInstance();
