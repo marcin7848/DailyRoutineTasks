@@ -34,4 +34,5 @@
     <string name="save">Save</string>
     <string name="provide_correct_data">You need to provide correct data to all fields!</string>
     <string name="saved">Saved!</string>
+    <string name="removed">Removed!</string>
 </resources>

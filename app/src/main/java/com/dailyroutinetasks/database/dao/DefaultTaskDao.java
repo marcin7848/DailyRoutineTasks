@@ -1,6 +1,7 @@
 package com.dailyroutinetasks.database.dao;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -17,6 +18,8 @@ public interface DefaultTaskDao {
     List<DefaultTask> loadAllByIds(int[] ids);
 
     @Insert
-    void insertDefaultTask(DefaultTask defaultTask);
+    void insert(DefaultTask defaultTask);
 
+    @Delete
+    void delete(DefaultTask defaultTask);
 }

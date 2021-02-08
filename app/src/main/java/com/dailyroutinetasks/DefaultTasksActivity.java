@@ -10,7 +10,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -41,6 +40,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
     boolean durationError = false;
     AppDatabase db;
     List<DefaultTask> defaultTasks = new ArrayList<>();
+    DefaultTaskAdapter defaultTaskAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
                 AppDatabase.class, "dailyRoutineTasksDb").build();
 
         ListView defaultTasksListView = findViewById(R.id.defaultTasksListView);
-        DefaultTaskAdapter defaultTaskAdapter = new DefaultTaskAdapter(DefaultTasksActivity.this);
+        defaultTaskAdapter = new DefaultTaskAdapter(DefaultTasksActivity.this);
         defaultTasksListView.setAdapter(defaultTaskAdapter);
 
         AsyncTask.execute(() -> {
@@ -134,7 +134,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
                 }
 
                 AsyncTask.execute(() -> {
-                    this.db.defaultTaskDao().insertDefaultTask(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], 0));
+                    this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], 0));
                     defaultTasks.clear();
                     defaultTasks.addAll(db.defaultTaskDao().getAll());
                     runOnUiThread(new Runnable() {
@@ -177,7 +177,18 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
             ImageButton deleteDefaultTask = row.findViewById(R.id.default_task_delete_icon);
             deleteDefaultTask.setOnClickListener(v -> {
-                Toast.makeText(DefaultTasksActivity.this, defaultTasks.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+                AsyncTask.execute(() -> {
+                    db.defaultTaskDao().delete(defaultTasks.get(position));
+                    defaultTasks.remove(position);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            defaultTaskAdapter.notifyDataSetChanged();
+                        }
+                    });
+                });
+
+                Toast.makeText(DefaultTasksActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();
             });
 
             return row;
