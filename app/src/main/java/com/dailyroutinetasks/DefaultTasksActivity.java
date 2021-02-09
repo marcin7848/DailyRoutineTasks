@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,8 +41,8 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 public class DefaultTasksActivity extends AppCompatActivity {
 
     boolean bottomPanelShown = false;
-    boolean titleError = false;
-    boolean durationError = false;
+    boolean titleValidate = false;
+    boolean durationValidate = false;
     AppDatabase db;
     List<DefaultTask> defaultTasks = new ArrayList<>();
     DefaultTaskRecyclerAdapter defaultTaskRecyclerAdapter;
@@ -91,14 +90,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
         editTextDefaultTaskTitle.addTextChangedListener(new TextValidator(editTextDefaultTaskTitle) {
             @Override
             public void validate(TextView textView, String text) {
-                titleError = false;
-                if (text.length() == 0) {
-                    textView.setError(getString(R.string.to_short));
-                    titleError = true;
-                } else if (text.length() > 80) {
-                    textView.setError(getString(R.string.to_long));
-                    titleError = true;
-                }
+                titleValidate = GlobalFunctions.validateTaskTitle(DefaultTasksActivity.this, textView, text);
             }
         });
 
@@ -106,17 +98,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
         editTextDefaultTaskDuration.addTextChangedListener(new TextValidator(editTextDefaultTaskDuration) {
             @Override
             public void validate(TextView textView, String text) {
-                durationError = false;
-                if (text.length() == 0) {
-                    textView.setError(getString(R.string.to_short));
-                    durationError = true;
-                } else if (text.length() > 10) {
-                    textView.setError(getString(R.string.to_long));
-                    durationError = true;
-                } else if (((!text.matches("\\d+") || Integer.parseInt(text) <= 0) && !text.matches("\\d{1,2}:\\d{2}"))) {
-                    textView.setError(getString(R.string.duration_must_match));
-                    durationError = true;
-                }
+                durationValidate = GlobalFunctions.validateTaskDuration(DefaultTasksActivity.this, textView, text);
             }
         });
 
@@ -124,23 +106,11 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
         save.setOnClickListener(v -> {
             Editable taskTitleText = editTextDefaultTaskTitle.getText();
-            Editable durationTitleText = editTextDefaultTaskDuration.getText();
-            if (titleError || durationError || taskTitleText.length() == 0 || durationTitleText.length() == 0)
+            Editable durationText = editTextDefaultTaskDuration.getText();
+            if (!titleValidate || !durationValidate || taskTitleText.length() == 0 || durationText.length() == 0)
                 Toast.makeText(DefaultTasksActivity.this, R.string.provide_correct_data, Toast.LENGTH_SHORT).show();
             else {
-                int[] duration = {0, 0};
-                if (durationTitleText.toString().matches("\\d+")) {
-                    int durationToConvert = Integer.parseInt(durationTitleText.toString());
-                    duration[0] = durationToConvert / 60;
-                    duration[1] = durationToConvert - duration[0] * 60;
-                } else {
-                    String[] durationParts = durationTitleText.toString().split(":");
-                    duration[0] = Integer.parseInt(durationParts[0]);
-                    int durationToConvert = Integer.parseInt(durationParts[1]);
-                    duration[0] += durationToConvert / 60;
-                    duration[1] = durationToConvert - ((int) (durationToConvert / 60)) * 60;
-                }
-
+                int[] duration = GlobalFunctions.convertDurationText(durationText);
                 int position = editPosition;
 
                 if (position == -1) {
@@ -196,7 +166,6 @@ public class DefaultTasksActivity extends AppCompatActivity {
                 editPosition = position;
                 showBottomPanel(true);
             });
-
         }
 
         @Override
