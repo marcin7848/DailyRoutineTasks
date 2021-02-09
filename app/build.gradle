@@ -49,5 +49,6 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
     testImplementation "androidx.room:room-testing:$room_version"
 
+    implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.3'
 
 }

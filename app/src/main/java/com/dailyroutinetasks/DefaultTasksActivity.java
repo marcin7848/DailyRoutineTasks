@@ -3,12 +3,14 @@ package com.dailyroutinetasks;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -34,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class DefaultTasksActivity extends AppCompatActivity {
 
@@ -186,8 +190,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull DefaultTaskViewHolder holder, int position) {
             holder.title.setText(defaultTasks.get(position).getTitle());
             String minutes = defaultTasks.get(position).getDurationMinutes() < 10 ? "0" + defaultTasks.get(position).getDurationMinutes() : "" + defaultTasks.get(position).getDurationMinutes();
-            //holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
-            holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), defaultTasks.get(position).getPositionNumber().toString()));
+            holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
 
             holder.itemView.setOnClickListener(v -> {
                 editPosition = position;
@@ -313,6 +316,16 @@ public class DefaultTasksActivity extends AppCompatActivity {
             }
         }
 
+        @Override
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+
+            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    .addSwipeLeftBackgroundColor(ContextCompat.getColor(DefaultTasksActivity.this, R.color.purple_200))
+                    .addSwipeLeftActionIcon(R.drawable.ic_delete)
+                    .create()
+                    .decorate();
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
     };
 
 
