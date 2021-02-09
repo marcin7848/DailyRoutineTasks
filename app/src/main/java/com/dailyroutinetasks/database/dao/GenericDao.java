@@ -9,7 +9,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public  interface TaskGenericDao<T>{
+public  interface GenericDao<T>{
 
     @Insert
      long insert(T t);

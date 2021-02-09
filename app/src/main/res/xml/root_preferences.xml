@@ -1,34 +1,67 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/messages_header">
+    <PreferenceCategory app:title="@string/settings"
+        android:icon="@drawable/ic_settings">
 
         <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
-            app:useSimpleSummaryProvider="true" />
+            app:key="start_day_time"
+            app:title="@string/start_day_time"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="6\:00"
+            />
 
-        <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
-            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:key="end_day_time"
+            app:title="@string/end_day_time"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="23\:00" />
+
+        <EditTextPreference
+            app:key="number_of_days_ahead"
+            app:title="@string/number_of_days_ahead"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="7"
+            app:singleLine="true"/>
+
+        <SwitchPreferenceCompat
+            app:key="dark_mode"
+            app:title="@string/active_dark_mode"
+            android:summaryOn="@string/active_dark_mode_on"
+            android:summaryOff="@string/active_dark_mode_off"
+            app:defaultValue="false"/>
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
+    <PreferenceCategory app:title="@string/notifications"
+        android:icon="@drawable/ic_notifications">
 
         <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+            app:key="notifications"
+            app:title="@string/disable_notifications"
+            android:summaryOn="@string/disable_notifications_on"
+            android:summaryOff="@string/disable_notifications_off"
+            app:defaultValue="false"/>
 
         <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+            app:key="vibrations"
+            app:title="@string/disable_vibrations"
+            android:summaryOn="@string/disable_vibrations_on"
+            android:summaryOff="@string/disable_vibrations_off"
+            app:defaultValue="false"/>
+
+        <EditTextPreference
+            app:key="notifications_sound"
+            app:title="@string/notifications_sound"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="default music"/>
+
+        <SeekBarPreference
+            app:key="notifications_volume"
+            app:title="@string/notifications_volume"
+            app:showSeekBarValue="true"
+            app:defaultValue="100"
+            />
 
     </PreferenceCategory>
 

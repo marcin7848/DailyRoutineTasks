@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         Setting setting = db.settingDao().findByConfigName("lastDay");
         if(setting == null){
             setting = new Setting("lastDay", "0");
-            db.settingDao().insertSetting(setting);
+            db.settingDao().insert(setting);
         }
         Log.d("settingId", "" + setting.getId());
 

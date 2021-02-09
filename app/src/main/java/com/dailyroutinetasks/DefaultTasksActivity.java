@@ -114,7 +114,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
                     textView.setError(getString(R.string.to_long));
                     durationError = true;
                 } else if (((!text.matches("\\d+") || Integer.parseInt(text) <= 0) && !text.matches("\\d{1,2}:\\d{2}"))) {
-                    textView.setError(getString(R.string.title_must_match));
+                    textView.setError(getString(R.string.duration_must_match));
                     durationError = true;
                 }
             }

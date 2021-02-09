@@ -1,7 +1,6 @@
 package com.dailyroutinetasks.database.dao;
 
 import androidx.room.Dao;
-import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.dailyroutinetasks.database.entities.Setting;
@@ -9,7 +8,7 @@ import com.dailyroutinetasks.database.entities.Setting;
 import java.util.List;
 
 @Dao
-public interface SettingDao {
+public interface SettingDao extends GenericDao<Setting> {
     @Query("SELECT * FROM Setting")
     List<Setting> getAll();
 
@@ -19,7 +18,5 @@ public interface SettingDao {
     @Query("SELECT * FROM Setting WHERE config_name LIKE :configName LIMIT 1")
     Setting findByConfigName(String configName);
 
-    @Insert
-    void insertSetting(Setting setting);
 
 }
