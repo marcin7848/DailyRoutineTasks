@@ -7,32 +7,28 @@
     android:id="@+id/tasksParent"
     tools:context=".MainActivity">
 
-    <Spinner
-        android:id="@+id/spinnerDay"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/task_day"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:background="@drawable/task_day_shape"
+        android:text="Sat 09.02.2021"
+        android:textColor="@color/task_day_text"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintWidth_percent=".4"
-        android:background="@drawable/style_spinner_day"/>
+        android:layout_margin="5dp"
+        android:clickable="true"/>
 
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerDay"
-        app:layout_constraintVertical_bias="0.026" />
+        app:layout_constraintTop_toBottomOf="@+id/task_day"
+        android:layout_marginTop="5dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tasksRecyclerView"
@@ -104,6 +100,34 @@
             android:hint="@string/duration"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextTaskTitle"/>
+
+        <TextView
+            android:id="@+id/copy_from_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/task_day_shape"
+            android:clickable="true"
+            android:text="@string/copy_tasks_from_day"
+            android:textColor="@color/task_day_text"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/add_default_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/task_day_shape"
+            android:text="@string/add_default_task"
+            android:textColor="@color/task_day_text"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tasksSave"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"/>
 
         <Button
             android:id="@+id/tasksSave"

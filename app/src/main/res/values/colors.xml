@@ -10,4 +10,6 @@
     <color name="light_blue">#3333ff</color>
     <color name="duration_background">#F49F1B</color>
     <color name="duration_text">#00154F</color>
+    <color name="task_day_background">#FF6200EE</color>
+    <color name="task_day_text">#FFFFFFFF</color>
 </resources>
