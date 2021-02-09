@@ -41,6 +41,7 @@
     <string name="day_time_match">Day time must match: h:mm (e.g. 11:30)</string>
     <string name="day_time_range">Day time range: 0:00 – 23:59</string>
     <string name="start_day_time_wrong">Start day time must be earlier than end day time</string>
+    <string name="end_day_time_wrong">End day time must be later than start day time</string>
     <string name="not_correct_value">Not correct value provided</string>
 
 

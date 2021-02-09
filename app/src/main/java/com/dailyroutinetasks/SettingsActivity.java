@@ -41,6 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static class SettingsFragment extends PreferenceFragmentCompat {
         Context context;
         boolean startDayTimeValidate = false;
+        boolean endDayTimeValidate = false;
 
         public SettingsFragment(Context c){
             this.context = c;
@@ -53,46 +54,66 @@ public class SettingsActivity extends AppCompatActivity {
             EditTextPreference start_day_time = getPreferenceManager().findPreference("start_day_time");
             EditTextPreference end_day_time = getPreferenceManager().findPreference("end_day_time");
 
-            start_day_time.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    if(startDayTimeValidate){
-                        return true;
-                    }else {
-                        Toast.makeText(context, R.string.not_correct_value, Toast.LENGTH_SHORT).show();
-                        return false;
+            start_day_time.setOnPreferenceChangeListener((preference, newValue) -> {
+                if(startDayTimeValidate){
+                    return true;
+                }else {
+                    Toast.makeText(context, R.string.not_correct_value, Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+
+            start_day_time.setOnBindEditTextListener(editText -> {
+                editText.setSingleLine(true);
+                editText.addTextChangedListener(new TextValidator(editText) {
+                    @Override
+                    public void validate(TextView textView, String text) {
+                        startDayTimeValidate = validateStartDayTime(textView, text, end_day_time, true);
                     }
+                });
+
+                editText.setOnEditorActionListener((v, actionId, event) -> {
+                    if(actionId== EditorInfo.IME_ACTION_DONE) {
+                        //After pressing V(tick) on keyboard
+                        closeKeyboard(v);
+                        dismissDialog();
+                    }
+                    return false;
+                });
+            });
+
+            end_day_time.setOnPreferenceChangeListener((preference, newValue) -> {
+                if(endDayTimeValidate){
+                    return true;
+                }else {
+                    Toast.makeText(context, R.string.not_correct_value, Toast.LENGTH_SHORT).show();
+                    return false;
                 }
             });
 
-            start_day_time.setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
-                @Override
-                public void onBindEditText(@NonNull EditText editText) {
-                    editText.setSingleLine(true);
-                    editText.addTextChangedListener(new TextValidator(editText) {
-                        @Override
-                        public void validate(TextView textView, String text) {
-                            startDayTimeValidate = validateStartDayTime(textView, text, end_day_time);
-                        }
-                    });
+            end_day_time.setOnBindEditTextListener(editText -> {
+                editText.setSingleLine(true);
+                editText.addTextChangedListener(new TextValidator(editText) {
+                    @Override
+                    public void validate(TextView textView, String text) {
+                        endDayTimeValidate = validateStartDayTime(textView, text, start_day_time, false);
+                    }
+                });
 
-                    editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                        @Override
-                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                            if(actionId== EditorInfo.IME_ACTION_DONE) {
-                                //After pressing V(tick) on keyboard
-                                closeKeyboard(v);
-                                dismissDialog();
-                            }
-                            return false;
-                        }
-                    });
-                }
+                editText.setOnEditorActionListener((v, actionId, event) -> {
+                    if(actionId== EditorInfo.IME_ACTION_DONE) {
+                        //After pressing V(tick) on keyboard
+                        closeKeyboard(v);
+                        dismissDialog();
+                    }
+                    return false;
+                });
             });
 
+            
         }
 
-        private boolean validateStartDayTime(TextView textView, String text, EditTextPreference end_day_time) {
+        private boolean validateStartDayTime(TextView textView, String text, EditTextPreference compare_day_time, boolean startDayTime) {
             if (text.length() == 0) {
                 textView.setError(getString(R.string.to_short));
                 return false;
@@ -110,17 +131,24 @@ public class SettingsActivity extends AppCompatActivity {
                     textView.setError(getString(R.string.day_time_range));
                     return false;
                 }else {
-                    String[] endDayTime = end_day_time.getText().split(":");
-                    int endDayHours = Integer.parseInt(endDayTime[0]);
-                    int endDayMinutes = Integer.parseInt(endDayTime[1]);
+                    String[] compareDayTime = compare_day_time.getText().split(":");
+                    int comparedDayHours = Integer.parseInt(compareDayTime[0]);
+                    int compareDayMinutes = Integer.parseInt(compareDayTime[1]);
 
-                    if(hours > endDayHours || (hours == endDayHours && minutes >= endDayMinutes)){
-                        textView.setError(getString(R.string.start_day_time_wrong));
-                        return false;
+                    if(startDayTime) {
+                        if (hours > comparedDayHours || (hours == comparedDayHours && minutes >= compareDayMinutes)) {
+                            textView.setError(getString(R.string.start_day_time_wrong));
+                            return false;
+                        }
+                    }
+                    else{
+                        if (hours < comparedDayHours || (hours == comparedDayHours && minutes <= compareDayMinutes)) {
+                            textView.setError(getString(R.string.end_day_time_wrong));
+                            return false;
+                        }
                     }
                 }
             }
-
             return true;
         }
 
