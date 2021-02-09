@@ -2,22 +2,18 @@ package com.dailyroutinetasks;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.preference.EditTextPreference;
 import androidx.preference.EditTextPreferenceDialogFragmentCompat;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -55,6 +51,8 @@ public class SettingsActivity extends AppCompatActivity {
             EditTextPreference start_day_time = getPreferenceManager().findPreference("start_day_time");
             EditTextPreference end_day_time = getPreferenceManager().findPreference("end_day_time");
             EditTextPreference number_of_days_ahead = getPreferenceManager().findPreference("number_of_days_ahead");
+            SwitchPreferenceCompat dark_mode = getPreferenceManager().findPreference("dark_mode");
+            SwitchPreferenceCompat disable_notifications = getPreferenceManager().findPreference("notifications");
 
             start_day_time.setOnPreferenceChangeListener((preference, newValue) -> {
                 if(startDayTimeValidate){
@@ -140,6 +138,29 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             });
 
+            dark_mode.setOnPreferenceChangeListener((preference, newValue) -> {
+                //TODO: changing to dark mode
+                boolean value = (Boolean) newValue;
+                if(value){
+                    Toast.makeText(context, "Dark mode active //to edit", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(context, "Dark mode inactive", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            });
+
+            disable_notifications.setOnPreferenceChangeListener((preference, newValue) -> {
+                //TODO: notifications
+                boolean value = (Boolean) newValue;
+                if(value){
+                    Toast.makeText(context, "Notifications disabled //to edit", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(context, "Notifications enabled", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            });
         }
 
         private boolean validateStartDayTime(TextView textView, String text, EditTextPreference compare_day_time, boolean startDayTime) {
