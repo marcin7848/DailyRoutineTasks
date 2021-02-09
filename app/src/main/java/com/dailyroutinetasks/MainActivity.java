@@ -69,10 +69,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent intentDefaultTasks = new Intent(this, DefaultTasksActivity.class);
                 startActivity(intentDefaultTasks);
                 return true;
-            case R.id.habits:
-                Intent intentHabits = new Intent(this, HabitsActivity.class);
-                startActivity(intentHabits);
-                return true;
             case R.id.settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);

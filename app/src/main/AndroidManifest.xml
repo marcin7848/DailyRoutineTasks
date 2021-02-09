@@ -9,9 +9,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DailyRoutineTasks">
-        <activity android:name=".HabitsActivity"
-            android:label="@string/title_activity_habits"
-            android:parentActivityName=".MainActivity"/>
         <activity android:name=".DefaultTasksActivity"
             android:label="@string/title_activity_default_tasks"
             android:parentActivityName=".MainActivity"/>

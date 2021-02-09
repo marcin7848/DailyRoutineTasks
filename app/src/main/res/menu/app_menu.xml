@@ -6,10 +6,6 @@
         android:title="@string/defaultTasks"
         app:showAsAction="never" />
 
-    <item android:id="@+id/habits"
-        android:title="@string/habits"
-        app:showAsAction="never" />
-
     <item android:id="@+id/settings"
         android:title="@string/settings"
         app:showAsAction="never" />
