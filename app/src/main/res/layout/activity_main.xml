@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/tasksParent"
     tools:context=".MainActivity">
 
     <Spinner
@@ -22,6 +23,7 @@
         android:background="@drawable/style_spinner_day"/>
 
     <View
+        android:id="@+id/view1"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/black"
@@ -31,5 +33,90 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerDay"
         app:layout_constraintVertical_bias="0.026" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tasksRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/view1" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/tasksAddButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/tasksParent"
+        app:layout_constraintEnd_toEndOf="@+id/tasksParent"
+        app:srcCompat="@drawable/ic_add"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
+        app:tint="@color/white"
+        app:backgroundTint="@color/design_default_color_primary_dark"
+        android:contentDescription="@string/add_new_task"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#8F000000"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:id="@+id/tasksShadow"
+        android:clickable="true"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tasksBottomPanel"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tasksParent"
+        android:clickable="true"
+        android:background="@color/white"
+        android:visibility="visible"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/addNewTaskString"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_new_task"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/editTextTaskTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:ems="15"
+            android:hint="@string/title"
+            android:text=""
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addNewTaskString" />
+
+        <EditText
+            android:id="@+id/editTextTaskDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="8"
+            android:text=""
+            android:autofillHints=""
+            android:hint="@string/duration"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextTaskTitle"/>
+
+        <Button
+            android:id="@+id/tasksSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:backgroundTint="@color/design_default_color_primary"
+            android:layout_gravity="end"
+            app:layout_constraintBottom_toBottomOf="@+id/tasksBottomPanel"
+            app:layout_constraintEnd_toEndOf="@+id/tasksBottomPanel"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

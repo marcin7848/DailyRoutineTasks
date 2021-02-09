@@ -29,7 +29,7 @@ public class Task {
     @ColumnInfo(name = "title")
     private String title;
 
-    @ColumnInfo(name = "start_time")
+    @ColumnInfo(name = "start_time", index = true)
     private Calendar startTime;
 
     @ColumnInfo(name = "duration_hours")
@@ -43,8 +43,5 @@ public class Task {
 
     @ColumnInfo(name = "day_id", index = true)
     private Long dayId;
-
-    @ColumnInfo(name = "habit_id", index = true)
-    private Long habitId;
 
 }

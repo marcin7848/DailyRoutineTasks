@@ -40,5 +40,6 @@
     <string name="not_correct_value">Not correct value provided</string>
     <string name="number_of_days_ahead_range">Number of days range: 1–14</string>
 
+    <string name="add_new_task">Add new task</string>
 
 </resources>
