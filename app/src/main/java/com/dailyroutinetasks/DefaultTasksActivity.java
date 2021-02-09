@@ -206,14 +206,11 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
         public class DefaultTaskViewHolder extends RecyclerView.ViewHolder {
             TextView title, duration;
-            ImageButton editDefaultTask, deleteDefaultTask;
 
             public DefaultTaskViewHolder(@NonNull View itemView) {
                 super(itemView);
                 title = itemView.findViewById(R.id.default_task_row_title);
                 duration = itemView.findViewById(R.id.default_task_duration_text);
-                editDefaultTask = itemView.findViewById(R.id.default_task_edit_icon);
-                deleteDefaultTask = itemView.findViewById(R.id.default_task_delete_icon);
             }
         }
     }

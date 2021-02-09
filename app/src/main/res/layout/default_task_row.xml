@@ -48,31 +48,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/default_task_row_title" />
 
-            <ImageButton
-                android:id="@+id/default_task_edit_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/design_default_color_primary_dark"
-                android:contentDescription="@string/edit"
-                android:src="@drawable/ic_edit"
-                app:layout_constraintBottom_toBottomOf="@+id/straightLineView"
-                app:layout_constraintEnd_toStartOf="@+id/default_task_delete_icon"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/default_task_delete_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/design_default_color_primary_dark"
-                android:contentDescription="@string/delete"
-                android:src="@drawable/ic_delete"
-                app:layout_constraintBottom_toBottomOf="@+id/straightLineView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <View
                 android:id="@+id/straightLineView"
                 android:layout_width="match_parent"
