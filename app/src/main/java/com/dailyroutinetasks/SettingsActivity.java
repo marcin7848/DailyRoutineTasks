@@ -42,6 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
         Context context;
         boolean startDayTimeValidate = false;
         boolean endDayTimeValidate = false;
+        boolean numberOfDaysAheadValidate = false;
 
         public SettingsFragment(Context c){
             this.context = c;
@@ -53,6 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             EditTextPreference start_day_time = getPreferenceManager().findPreference("start_day_time");
             EditTextPreference end_day_time = getPreferenceManager().findPreference("end_day_time");
+            EditTextPreference number_of_days_ahead = getPreferenceManager().findPreference("number_of_days_ahead");
 
             start_day_time.setOnPreferenceChangeListener((preference, newValue) -> {
                 if(startDayTimeValidate){
@@ -110,7 +112,34 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             });
 
-            
+            number_of_days_ahead.setOnPreferenceChangeListener((preference, newValue) -> {
+                if(numberOfDaysAheadValidate){
+                    return true;
+                }else {
+                    Toast.makeText(context, R.string.not_correct_value, Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+
+            number_of_days_ahead.setOnBindEditTextListener(editText -> {
+                editText.setSingleLine(true);
+                editText.addTextChangedListener(new TextValidator(editText) {
+                    @Override
+                    public void validate(TextView textView, String text) {
+                        numberOfDaysAheadValidate = validateNumberOfDaysAhead(textView, text);
+                    }
+                });
+
+                editText.setOnEditorActionListener((v, actionId, event) -> {
+                    if(actionId== EditorInfo.IME_ACTION_DONE) {
+                        //After pressing V(tick) on keyboard
+                        closeKeyboard(v);
+                        dismissDialog();
+                    }
+                    return false;
+                });
+            });
+
         }
 
         private boolean validateStartDayTime(TextView textView, String text, EditTextPreference compare_day_time, boolean startDayTime) {
@@ -148,6 +177,20 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                     }
                 }
+            }
+            return true;
+        }
+
+        private boolean validateNumberOfDaysAhead(TextView textView, String text) {
+            if (text.length() == 0) {
+                textView.setError(getString(R.string.to_short));
+                return false;
+            } else if (text.length() > 2) {
+                textView.setError(getString(R.string.to_long));
+                return false;
+            } else if (!text.matches("^([1-9]|1[0-4])$")) {
+                textView.setError(getString(R.string.number_of_days_ahead_range));
+                return false;
             }
             return true;
         }
