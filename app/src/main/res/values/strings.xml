@@ -23,7 +23,7 @@
     <string name="saved">Saved!</string>
     <string name="removed">Removed!</string>
 
-    <string name="notifications">Notifications</string>
+    <string name="system">System</string>
     <string name="start_day_time">Start day time</string>
     <string name="end_day_time">End day time</string>
     <string name="number_of_days_ahead">Number of days ahead</string>
@@ -33,11 +33,6 @@
     <string name="disable_notifications">Disable notifications</string>
     <string name="disable_notifications_on">You will no longer receive notifications</string>
     <string name="disable_notifications_off">You will receive all notifications</string>
-    <string name="disable_vibrations">Disable vibrations</string>
-    <string name="disable_vibrations_on">Vibrations will no longer occur</string>
-    <string name="disable_vibrations_off">Vibrations will occur</string>
-    <string name="notifications_sound">Notifications sound</string>
-    <string name="notifications_volume">Volume</string>
     <string name="day_time_match">Day time must match: h:mm (e.g. 11:30)</string>
     <string name="day_time_range">Day time range: 0:00 – 23:59</string>
     <string name="start_day_time_wrong">Start day time must be earlier than end day time</string>

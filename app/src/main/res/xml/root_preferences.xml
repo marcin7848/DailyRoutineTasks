@@ -24,6 +24,11 @@
             app:defaultValue="7"
             app:singleLine="true"/>
 
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/system"
+        android:icon="@drawable/ic_notifications">
+
         <SwitchPreferenceCompat
             app:key="dark_mode"
             app:title="@string/active_dark_mode"
@@ -31,37 +36,12 @@
             android:summaryOff="@string/active_dark_mode_off"
             app:defaultValue="false"/>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/notifications"
-        android:icon="@drawable/ic_notifications">
-
         <SwitchPreferenceCompat
             app:key="notifications"
             app:title="@string/disable_notifications"
             android:summaryOn="@string/disable_notifications_on"
             android:summaryOff="@string/disable_notifications_off"
             app:defaultValue="false"/>
-
-        <SwitchPreferenceCompat
-            app:key="vibrations"
-            app:title="@string/disable_vibrations"
-            android:summaryOn="@string/disable_vibrations_on"
-            android:summaryOff="@string/disable_vibrations_off"
-            app:defaultValue="false"/>
-
-        <EditTextPreference
-            app:key="notifications_sound"
-            app:title="@string/notifications_sound"
-            app:useSimpleSummaryProvider="true"
-            app:defaultValue="default music"/>
-
-        <SeekBarPreference
-            app:key="notifications_volume"
-            app:title="@string/notifications_volume"
-            app:showSeekBarValue="true"
-            app:defaultValue="100"
-            />
 
     </PreferenceCategory>
 
