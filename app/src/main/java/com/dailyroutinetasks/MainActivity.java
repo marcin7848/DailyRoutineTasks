@@ -4,53 +4,47 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
-import android.content.Context;
+import android.app.Dialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.CalendarView;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.dailyroutinetasks.database.AppDatabase;
 import com.dailyroutinetasks.database.entities.Setting;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
+    AppDatabase db;
+    Calendar today;
+    Calendar pickedDay;
+    Dialog pickDayDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+        db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "dailyRoutineTasksDb").build();
 
-        AsyncTask.execute(() -> {
-            updateDays(db);
-        });
+        today = Calendar.getInstance(TimeZone.getDefault());
+        pickedDay = (Calendar) today.clone();
 
-        Spinner spinnerDay = (Spinner) findViewById(R.id.spinnerDay);
-        spinnerDay.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
-            }
+        updateTasksView();
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        pickDayDialog = new Dialog(this);
+        pickDayDialog.setContentView(R.layout.pick_day_view);
 
     }
 
@@ -58,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.app_menu, menu);
-        this.fillSpinner();
         return true;
     }
 
@@ -77,19 +70,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void fillSpinner(){
-        String[] arraySpinner = new String[] {
-                "test1", "test2", "test3", "test4", "test5", "test6", "test7"
-        };
-        Spinner s = (Spinner) findViewById(R.id.spinnerDay);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                R.layout.style_spinner_day_element, arraySpinner);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        s.setAdapter(adapter);
 
-        int spinnerPosition = adapter.getPosition("test4");
-        s.setSelection(spinnerPosition);
-    }
 
     public void updateDays(AppDatabase db){
         Setting setting = db.settingDao().findByConfigName("lastDay");
@@ -104,7 +85,28 @@ public class MainActivity extends AppCompatActivity {
         Long time = calendar.getTimeInMillis();
         Log.d("timeZone", calendar.getTimeZone().toString());
 
-        Log.d("hourCalendar", ""+ calendar.get(Calendar.HOUR_OF_DAY));
+        Log.d("hourCalendar", Integer.toString(calendar.get(Calendar.HOUR_OF_DAY)));
 
+    }
+
+    private void updateTasksView(){
+        TextView task_day = findViewById(R.id.task_day);
+        task_day.setText(pickedDay.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
+                pickedDay.get(Calendar.DAY_OF_MONTH) + " " +
+                pickedDay.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
+                pickedDay.get(Calendar.YEAR));
+    }
+
+    public void showPickDayDialog(View v){
+        pickDayDialog.show();
+        CalendarView pickDayCalendar = pickDayDialog.findViewById(R.id.pickDayCalendarView);
+        pickDayCalendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                pickedDay.set(year, month, dayOfMonth);
+                updateTasksView();
+                pickDayDialog.hide();
+            }
+        });
     }
 }

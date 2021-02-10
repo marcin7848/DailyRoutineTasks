@@ -24,19 +24,21 @@ import static androidx.room.ForeignKey.CASCADE;
 public class Task extends BaseTask{
 
     @Ignore
-    public Task(Long id, String title, Integer durationHours, Integer durationMinutes, Integer positionNumber, boolean done, Calendar startTime, Long dayId) {
+    public Task(Long id, String title, Integer durationHours, Integer durationMinutes, Integer positionNumber, boolean done, Calendar startTime, String dayString, Long dayId) {
         super(title, durationHours, durationMinutes, positionNumber);
         this.id = id;
         this.done = done;
         this.startTime = startTime;
+        this.dayString = dayString;
         this.dayId = dayId;
     }
 
     @Ignore
-    public Task(String title, Integer durationHours, Integer durationMinutes, Integer positionNumber, boolean done, Calendar startTime, Long dayId) {
+    public Task(String title, Integer durationHours, Integer durationMinutes, Integer positionNumber, boolean done, Calendar startTime, String dayString, Long dayId) {
         super(title, durationHours, durationMinutes, positionNumber);
         this.done = done;
         this.startTime = startTime;
+        this.dayString = dayString;
         this.dayId = dayId;
     }
 
@@ -44,7 +46,8 @@ public class Task extends BaseTask{
     public Task(Task task) {
         super(task.title, task.durationHours, task.durationMinutes, task.positionNumber);
         this.done = task.done;
-        this.startTime = task.startTime;
+        this.startTime = (Calendar) task.startTime.clone();
+        this.dayString = task.dayString;
         this.dayId = task.dayId;
     }
 
@@ -57,6 +60,9 @@ public class Task extends BaseTask{
 
     @ColumnInfo(name = "start_time", index = true)
     private Calendar startTime;
+
+    @ColumnInfo(name = "day_string", index = true)
+    private String dayString;
 
     @ColumnInfo(name = "day_id", index = true)
     private Long dayId;
