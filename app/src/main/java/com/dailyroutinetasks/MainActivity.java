@@ -50,7 +50,6 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 public class MainActivity extends AppCompatActivity {
 
     AppDatabase db;
-    Calendar pickedCalendarDay;
     Dialog pickDayDialog;
     Day day;
 
@@ -74,16 +73,12 @@ public class MainActivity extends AppCompatActivity {
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "dailyRoutineTasksDb").build();
 
-        pickedCalendarDay = Calendar.getInstance(TimeZone.getDefault());
+        day = new Day();
+        day.setDayTime(Calendar.getInstance(TimeZone.getDefault()));
 
         start_day_time = GlobalFunctions.convertDayTime(PreferenceManager
                 .getDefaultSharedPreferences(this)
                 .getString("start_day_time", "6:00"));
-
-        pickedCalendarDay.set(Calendar.HOUR_OF_DAY, start_day_time[0]);
-        pickedCalendarDay.set(Calendar.MINUTE, start_day_time[1]);
-        pickedCalendarDay.set(Calendar.SECOND, 0);
-        pickedCalendarDay.set(Calendar.MILLISECOND, 0);
 
         updateTasksView();
 
@@ -141,11 +136,11 @@ public class MainActivity extends AppCompatActivity {
                         int newPositionNumber = lastPositionNumber+1;
                         lastPositionNumber++;
 
-                        pickedCalendarDay.add(Calendar.HOUR, duration[0]);
-                        pickedCalendarDay.add(Calendar.MINUTE, duration[1]);
+                        day.getDayTime().add(Calendar.HOUR, duration[0]);
+                        day.getDayTime().add(Calendar.MINUTE, duration[1]);
 
-                        long newId = this.db.taskDao().insert(new Task(taskTitleText.toString(), duration[0], duration[1], newPositionNumber, false, pickedCalendarDay, day.getId()));
-                        tasks.add(new Task(newId, taskTitleText.toString(), duration[0], duration[1], newPositionNumber, false, pickedCalendarDay, day.getId()));
+                        long newId = this.db.taskDao().insert(new Task(taskTitleText.toString(), duration[0], duration[1], newPositionNumber, false, day.getDayTime(), day.getId()));
+                        tasks.add(new Task(newId, taskTitleText.toString(), duration[0], duration[1], newPositionNumber, false, day.getDayTime(), day.getId()));
                         runOnUiThread(() -> taskRecyclerAdapter.notifyItemInserted(tasks.size() - 1));
                     });
                 } else {
@@ -187,39 +182,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateTasksView(){
-        TextView task_day = findViewById(R.id.task_day);
-        task_day.setText(pickedCalendarDay.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
-                pickedCalendarDay.get(Calendar.DAY_OF_MONTH) + " " +
-                pickedCalendarDay.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
-                pickedCalendarDay.get(Calendar.YEAR));
+        day.getDayTime().set(Calendar.HOUR_OF_DAY, start_day_time[0]);
+        day.getDayTime().set(Calendar.MINUTE, start_day_time[1]);
+        day.getDayTime().set(Calendar.SECOND, 0);
+        day.getDayTime().set(Calendar.MILLISECOND, 0);
 
         AsyncTask.execute(() ->{
-            day = db.dayDao().getDayByDayString(GlobalFunctions.convertCalendarToDateString(pickedCalendarDay));
-            if(day == null){
-                Day newDay = new Day(pickedCalendarDay, GlobalFunctions.convertCalendarToDateString(pickedCalendarDay));
+            Day existingDay = db.dayDao().getDayByDayString(GlobalFunctions.convertCalendarToDateString(day.getDayTime()));
+            if(existingDay == null){
+                Day newDay = new Day(day.getDayTime(), GlobalFunctions.convertCalendarToDateString(day.getDayTime()));
                 long newDayId = db.dayDao().insert(newDay);
-                day = db.dayDao().getDayById(newDayId);
+                newDay.setId(newDayId);
+                day = newDay;
             }else{
-                tasks.addAll(db.taskDao().getTasksByDayId(day.getId()));
+                tasks.addAll(db.taskDao().getTasksByDayId(existingDay.getId()));
                 runOnUiThread(() -> taskRecyclerAdapter.notifyDataSetChanged());
                 lastPositionNumber = tasks.size()-1;
-                pickedCalendarDay = (Calendar) tasks.get(tasks.size()-1).getStartTime().clone();
+                day.setDayTime((Calendar) tasks.get(tasks.size()-1).getStartTime().clone());
             }
+
+            TextView task_day = findViewById(R.id.task_day);
+            task_day.setText(day.getDayTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
+                    day.getDayTime().get(Calendar.DAY_OF_MONTH) + " " +
+                    day.getDayTime().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
+                    day.getDayTime().get(Calendar.YEAR));
         });
     }
 
     public void showPickDayDialog(View v){
         pickDayDialog.show();
         CalendarView pickDayCalendar = pickDayDialog.findViewById(R.id.pickDayCalendarView);
-        pickDayCalendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                pickedCalendarDay.set(year, month, dayOfMonth, start_day_time[0], start_day_time[1], 0);
-                pickedCalendarDay.set(Calendar.MILLISECOND, 0);
+        pickDayCalendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            day.getDayTime().set(year, month, dayOfMonth);
 
-                updateTasksView();
-                pickDayDialog.hide();
-            }
+            updateTasksView();
+            pickDayDialog.hide();
         });
     }
 
