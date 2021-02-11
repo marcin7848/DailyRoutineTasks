@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateTasksView(){
+        TextView task_day = findViewById(R.id.task_day);
         day.getDayTime().set(Calendar.HOUR_OF_DAY, start_day_time[0]);
         day.getDayTime().set(Calendar.MINUTE, start_day_time[1]);
         day.getDayTime().set(Calendar.SECOND, 0);
@@ -192,20 +193,23 @@ public class MainActivity extends AppCompatActivity {
             if(existingDay == null){
                 Day newDay = new Day(day.getDayTime(), GlobalFunctions.convertCalendarToDateString(day.getDayTime()));
                 long newDayId = db.dayDao().insert(newDay);
-                newDay.setId(newDayId);
-                day = newDay;
+                day.setId(newDayId);
+                day.setDayTime(newDay.getDayTime());
+                day.setDayString(newDay.getDayString());
             }else{
                 tasks.addAll(db.taskDao().getTasksByDayId(existingDay.getId()));
                 runOnUiThread(() -> taskRecyclerAdapter.notifyDataSetChanged());
                 lastPositionNumber = tasks.size()-1;
+                day = existingDay;
+                //day.setId(existingDay.getId());
                 day.setDayTime((Calendar) tasks.get(tasks.size()-1).getStartTime().clone());
+                //day.setDayString(GlobalFunctions.convertCalendarToDateString(existingDay.getDayTime()));
             }
 
-            TextView task_day = findViewById(R.id.task_day);
-            task_day.setText(day.getDayTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
+            runOnUiThread(() -> task_day.setText(day.getDayTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
                     day.getDayTime().get(Calendar.DAY_OF_MONTH) + " " +
                     day.getDayTime().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
-                    day.getDayTime().get(Calendar.YEAR));
+                    day.getDayTime().get(Calendar.YEAR)));
         });
     }
 
@@ -323,6 +327,8 @@ public class MainActivity extends AppCompatActivity {
 
             task1.setPositionNumber(toPosition);
             task2.setPositionNumber(fromPosition);
+
+
             List<Task> updateTasks = Arrays.asList(task1, task2);
 
             AsyncTask.execute(() -> {
