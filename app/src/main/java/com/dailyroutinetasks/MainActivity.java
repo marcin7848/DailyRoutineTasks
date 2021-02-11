@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView tasksRecyclerView;
     int[] start_day_time = {0, 0};
 
-    int lastPositionNumber = 0;
+    int lastPositionNumber = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,11 +136,13 @@ public class MainActivity extends AppCompatActivity {
                         int newPositionNumber = lastPositionNumber+1;
                         lastPositionNumber++;
 
+                        Calendar newCalendar = (Calendar) day.getDayTime().clone();
+                        long newId = this.db.taskDao().insert(new Task(taskTitleText.toString(), duration[0], duration[1], newPositionNumber, false, newCalendar, day.getId()));
+                        tasks.add(new Task(newId, taskTitleText.toString(), duration[0], duration[1], newPositionNumber, false, newCalendar, day.getId()));
+
                         day.getDayTime().add(Calendar.HOUR, duration[0]);
                         day.getDayTime().add(Calendar.MINUTE, duration[1]);
 
-                        long newId = this.db.taskDao().insert(new Task(taskTitleText.toString(), duration[0], duration[1], newPositionNumber, false, day.getDayTime(), day.getId()));
-                        tasks.add(new Task(newId, taskTitleText.toString(), duration[0], duration[1], newPositionNumber, false, day.getDayTime(), day.getId()));
                         runOnUiThread(() -> taskRecyclerAdapter.notifyItemInserted(tasks.size() - 1));
                     });
                 } else {
@@ -196,14 +198,19 @@ public class MainActivity extends AppCompatActivity {
                 day.setId(newDayId);
                 day.setDayTime(newDay.getDayTime());
                 day.setDayString(newDay.getDayString());
+                lastPositionNumber = -1;
             }else{
                 tasks.addAll(db.taskDao().getTasksByDayId(existingDay.getId()));
                 runOnUiThread(() -> taskRecyclerAdapter.notifyDataSetChanged());
                 lastPositionNumber = tasks.size()-1;
-                day = existingDay;
-                //day.setId(existingDay.getId());
-                day.setDayTime((Calendar) tasks.get(tasks.size()-1).getStartTime().clone());
-                //day.setDayString(GlobalFunctions.convertCalendarToDateString(existingDay.getDayTime()));
+                day.setId(existingDay.getId());
+                day.setDayString(GlobalFunctions.convertCalendarToDateString(existingDay.getDayTime()));
+                if(tasks.size() > 0){
+                    day.setDayTime((Calendar) tasks.get(tasks.size()-1).getStartTime().clone());
+                    day.getDayTime().add(Calendar.HOUR, tasks.get(tasks.size()-1).getDurationHours());
+                    day.getDayTime().add(Calendar.MINUTE, tasks.get(tasks.size()-1).getDurationMinutes());
+                }
+
             }
 
             runOnUiThread(() -> task_day.setText(day.getDayTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
@@ -320,6 +327,19 @@ public class MainActivity extends AppCompatActivity {
             final int toPosition = target.getAdapterPosition();
             Task task1 = tasks.get(fromPosition);
             Task task2 = tasks.get(toPosition);
+
+            if(fromPosition < toPosition){
+                task2.setStartTime((Calendar) task1.getStartTime().clone());
+                task1.setStartTime((Calendar) task2.getStartTime().clone());
+                task1.getStartTime().add(Calendar.HOUR, task2.getDurationHours());
+                task1.getStartTime().add(Calendar.MINUTE, task2.getDurationMinutes());
+            }
+            else{
+                task1.setStartTime((Calendar) task2.getStartTime().clone());
+                task2.setStartTime((Calendar)task1.getStartTime().clone());
+                task2.getStartTime().add(Calendar.HOUR, task1.getDurationHours());
+                task2.getStartTime().add(Calendar.MINUTE, task1.getDurationMinutes());
+            }
 
             Collections.swap(tasks, fromPosition, toPosition);
             recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
