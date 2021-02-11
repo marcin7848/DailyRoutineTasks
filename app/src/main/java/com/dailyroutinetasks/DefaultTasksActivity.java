@@ -49,6 +49,8 @@ public class DefaultTasksActivity extends AppCompatActivity {
     int editPosition = -1;
     RecyclerView defaultTasksRecyclerView;
 
+    int lastPositionNumber = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +75,7 @@ public class DefaultTasksActivity extends AppCompatActivity {
         AsyncTask.execute(() -> {
             defaultTasks.addAll(db.defaultTaskDao().getAll());
             runOnUiThread(() -> defaultTaskRecyclerAdapter.notifyDataSetChanged());
+            lastPositionNumber = defaultTasks.size()-1;
         });
 
         FloatingActionButton defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
@@ -115,13 +118,10 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
                 if (position == -1) {
                     AsyncTask.execute(() -> {
-                        DefaultTask defaultTaskWithLastPositionNumber = this.db.defaultTaskDao().getDefaultTaskWithLastPositionNumber();
-                        int newLastPosition = 0;
-                        if (defaultTaskWithLastPositionNumber != null)
-                            newLastPosition = defaultTaskWithLastPositionNumber.getPositionNumber() + 1;
-
-                        long newId = this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], newLastPosition));
-                        defaultTasks.add(new DefaultTask(newId, taskTitleText.toString(), duration[0], duration[1], newLastPosition));
+                        int newPositionNumber = lastPositionNumber+1;
+                        lastPositionNumber++;
+                        long newId = this.db.defaultTaskDao().insert(new DefaultTask(taskTitleText.toString(), duration[0], duration[1], newPositionNumber));
+                        defaultTasks.add(new DefaultTask(newId, taskTitleText.toString(), duration[0], duration[1], newPositionNumber));
                         runOnUiThread(() -> defaultTaskRecyclerAdapter.notifyItemInserted(defaultTasks.size() - 1));
                     });
                 } else {
@@ -186,21 +186,9 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
     private void showBottomPanel(boolean show) {
         bottomPanelShown = show;
-        View defaultTasksBottomPanel = findViewById(R.id.defaultTasksBottomPanel);
-        ViewGroup parent = findViewById(R.id.defaultTasksParent);
 
-        Transition transition = new Slide(Gravity.BOTTOM);
-        transition.setDuration(600);
-        transition.addTarget(R.id.defaultTasksBottomPanel);
-
-        TransitionManager.beginDelayedTransition(parent, transition);
-        defaultTasksBottomPanel.setVisibility(show ? View.VISIBLE : View.GONE);
-
-        View defaultTasksAddButton = findViewById(R.id.defaultTasksAddButton);
-        defaultTasksAddButton.setVisibility(show ? View.GONE : View.VISIBLE);
-
-        View defaultTasksShadow = findViewById(R.id.defaultTasksShadow);
-        defaultTasksShadow.setVisibility(show ? View.VISIBLE : View.GONE);
+        GlobalFunctions.showBottomPanel(DefaultTasksActivity.this, show,
+                R.id.defaultTasksBottomPanel, R.id.defaultTasksParent, R.id.defaultTasksAddButton, R.id.defaultTasksShadow);
 
         if (!show) {
             editPosition = -1;
@@ -265,6 +253,8 @@ public class DefaultTasksActivity extends AppCompatActivity {
             final int position = viewHolder.getAdapterPosition();
             if (direction == ItemTouchHelper.LEFT) {
                 DefaultTask removedDefaultTask = new DefaultTask(defaultTasks.get(position));
+                lastPositionNumber--;
+
                 defaultTasks.remove(position);
                 defaultTaskRecyclerAdapter.notifyItemRemoved(position);
                 defaultTaskRecyclerAdapter.notifyItemRangeChanged(position, defaultTasks.size() - position);

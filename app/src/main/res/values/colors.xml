@@ -12,4 +12,6 @@
     <color name="duration_text">#00154F</color>
     <color name="task_day_background">#FF6200EE</color>
     <color name="task_day_text">#FFFFFFFF</color>
+    <color name="time_background">#210070</color>
+    <color name="time_text">#03DAC5</color>
 </resources>

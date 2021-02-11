@@ -18,6 +18,12 @@ import lombok.Setter;
 @Entity
 public class Day {
 
+    @Ignore
+    public Day(Calendar dayTime, String dayString){
+        this.dayTime = dayTime;
+        this.dayString = dayString;
+    }
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     private Long id;

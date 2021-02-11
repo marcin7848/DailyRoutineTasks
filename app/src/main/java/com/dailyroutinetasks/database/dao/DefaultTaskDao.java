@@ -8,7 +8,7 @@ import com.dailyroutinetasks.database.entities.DefaultTask;
 import java.util.List;
 
 @Dao
-public interface DefaultDao extends GenericDao<DefaultTask> {
+public interface DefaultTaskDao extends GenericDao<DefaultTask> {
 
     @Query("SELECT * FROM defaulttask ORDER BY position_number ASC")
     List<DefaultTask> getAll();
