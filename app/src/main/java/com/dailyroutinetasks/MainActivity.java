@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     AppDatabase db;
     Dialog pickDayDialog;
     Dialog copyFromDayDialog;
+    Dialog insertDefaultTaskDialog;
     Day day;
 
     boolean bottomPanelShown = false;
@@ -86,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
 
         copyFromDayDialog = new Dialog(this);
         copyFromDayDialog.setContentView(R.layout.dialog_pick_day_view);
+
+        insertDefaultTaskDialog = new Dialog(this);
+        insertDefaultTaskDialog.setContentView(R.layout.dialog_insert_default_task);
 
         tasksRecyclerView = findViewById(R.id.tasksRecyclerView);
         taskRecyclerAdapter = new TaskRecyclerAdapter(MainActivity.this);
@@ -289,6 +293,12 @@ public class MainActivity extends AppCompatActivity {
             showBottomPanel(false);
             Toast.makeText(MainActivity.this, R.string.copied, Toast.LENGTH_SHORT).show();
         });
+    }
+
+    public void showInsertDefaultTaskDialog(View v){
+        insertDefaultTaskDialog.show();
+
+        //insertDefaultTaskDialog.hide();
     }
 
     class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.TaskViewHolder> {
