@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                         this.db.taskDao().updateAll(tasks);
                     });
                     taskRecyclerAdapter.notifyDataSetChanged();
-                    
+
                 }
 
                 showBottomPanel(false);
@@ -275,6 +275,8 @@ public class MainActivity extends AppCompatActivity {
                 showBottomPanel(true);
             });
         }
+
+
 
         @Override
         public int getItemCount() {
