@@ -43,6 +43,7 @@ public class Task extends BaseTask{
     @Ignore
     public Task(Task task) {
         super(task.title, task.durationHours, task.durationMinutes, task.positionNumber);
+        this.id = task.id;
         this.done = task.done;
         this.startTime = (Calendar) task.startTime.clone();
         this.dayId = task.dayId;

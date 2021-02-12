@@ -323,40 +323,40 @@ public class MainActivity extends AppCompatActivity {
             ItemTouchHelper.LEFT) {
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            final int fromPosition = viewHolder.getAdapterPosition();
-            final int toPosition = target.getAdapterPosition();
-            Task task1 = tasks.get(fromPosition);
-            Task task2 = tasks.get(toPosition);
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
 
-            if(fromPosition < toPosition){
-                task2.setStartTime((Calendar) task1.getStartTime().clone());
-                task1.setStartTime((Calendar) task2.getStartTime().clone());
-                task1.getStartTime().add(Calendar.HOUR, task2.getDurationHours());
-                task1.getStartTime().add(Calendar.MINUTE, task2.getDurationMinutes());
-            }
-            else{
-                task1.setStartTime((Calendar) task2.getStartTime().clone());
-                task2.setStartTime((Calendar)task1.getStartTime().clone());
-                task2.getStartTime().add(Calendar.HOUR, task1.getDurationHours());
-                task2.getStartTime().add(Calendar.MINUTE, task1.getDurationMinutes());
+            if(fromPosition != toPosition) {
+                if (fromPosition < toPosition) {
+                    tasks.get(toPosition).setStartTime((Calendar) tasks.get(fromPosition).getStartTime().clone());
+                    tasks.get(fromPosition).getStartTime().add(Calendar.HOUR, tasks.get(toPosition).getDurationHours());
+                    tasks.get(fromPosition).getStartTime().add(Calendar.MINUTE, tasks.get(toPosition).getDurationMinutes());
+                } else {
+                    tasks.get(fromPosition).setStartTime((Calendar) tasks.get(toPosition).getStartTime().clone());
+                    tasks.get(toPosition).getStartTime().add(Calendar.HOUR, tasks.get(fromPosition).getDurationHours());
+                    tasks.get(toPosition).getStartTime().add(Calendar.MINUTE, tasks.get(fromPosition).getDurationMinutes());
+                }
+
+                tasks.get(fromPosition).setPositionNumber(toPosition);
+                tasks.get(toPosition).setPositionNumber(fromPosition);
+
+                List<Task> updateTasks = Arrays.asList(tasks.get(fromPosition), tasks.get(toPosition));
+
+                AsyncTask.execute(() -> {
+                    db.taskDao().updateAll(updateTasks);
+                });
+
+                recyclerView.getAdapter().notifyItemChanged(fromPosition);
+                recyclerView.getAdapter().notifyItemChanged(toPosition);
             }
 
             Collections.swap(tasks, fromPosition, toPosition);
             recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
             recyclerView.getAdapter().notifyItemRangeChanged(Math.min(fromPosition, toPosition), Math.max(fromPosition, toPosition));
 
-            task1.setPositionNumber(toPosition);
-            task2.setPositionNumber(fromPosition);
-
-
-            List<Task> updateTasks = Arrays.asList(task1, task2);
-
-            AsyncTask.execute(() -> {
-                db.taskDao().updateAll(updateTasks);
-            });
-
             return false;
         }
+
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
@@ -366,13 +366,24 @@ public class MainActivity extends AppCompatActivity {
                 tasks.remove(position);
                 taskRecyclerAdapter.notifyItemRemoved(position);
                 taskRecyclerAdapter.notifyItemRangeChanged(position, tasks.size() - position);
+                lastPositionNumber--;
+                day.getDayTime().add(Calendar.HOUR, -removedTask.getDurationHours());
+                day.getDayTime().add(Calendar.MINUTE, -removedTask.getDurationMinutes());
 
                 AsyncTask.execute(() -> {
                     db.taskDao().delete(removedTask);
-                    int[] pos = {0};
+                    int[] pos = {position};
                     tasks.forEach(dt -> {
-                        dt.setPositionNumber(pos[0]++);
+                        if(dt.getPositionNumber() > position){
+                            dt.setPositionNumber(pos[0]++);
+                            dt.getStartTime().add(Calendar.HOUR, -removedTask.getDurationHours());
+                            dt.getStartTime().add(Calendar.MINUTE, -removedTask.getDurationMinutes());
+                        }
                     });
+
+                    if(tasks.size() > 0)
+                        runOnUiThread(() -> taskRecyclerAdapter.notifyDataSetChanged());
+
                     db.taskDao().updateAll(tasks);
                 });
 

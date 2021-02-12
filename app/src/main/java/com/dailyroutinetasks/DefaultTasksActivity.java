@@ -261,9 +261,10 @@ public class DefaultTasksActivity extends AppCompatActivity {
 
                 AsyncTask.execute(() -> {
                     db.defaultTaskDao().delete(removedDefaultTask);
-                    int[] pos = {0};
+                    int[] pos = {position};
                     defaultTasks.forEach(dt -> {
-                        dt.setPositionNumber(pos[0]++);
+                        if(dt.getPositionNumber() > position)
+                            dt.setPositionNumber(pos[0]++);
                     });
                     db.defaultTaskDao().updateAll(defaultTasks);
                 });
