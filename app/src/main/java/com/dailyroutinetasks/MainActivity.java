@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
         day.getDayTime().set(Calendar.MINUTE, start_day_time[1]);
         day.getDayTime().set(Calendar.SECOND, 0);
         day.getDayTime().set(Calendar.MILLISECOND, 0);
+        tasks.clear();
 
         AsyncTask.execute(() ->{
             Day existingDay = db.dayDao().getDayByDayString(GlobalFunctions.convertCalendarToDateString(day.getDayTime()));
@@ -201,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
                 lastPositionNumber = -1;
             }else{
                 tasks.addAll(db.taskDao().getTasksByDayId(existingDay.getId()));
-                runOnUiThread(() -> taskRecyclerAdapter.notifyDataSetChanged());
                 lastPositionNumber = tasks.size()-1;
                 day.setId(existingDay.getId());
                 day.setDayString(GlobalFunctions.convertCalendarToDateString(existingDay.getDayTime()));
@@ -213,10 +213,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            runOnUiThread(() -> task_day.setText(day.getDayTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
-                    day.getDayTime().get(Calendar.DAY_OF_MONTH) + " " +
-                    day.getDayTime().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
-                    day.getDayTime().get(Calendar.YEAR)));
+            runOnUiThread(() -> {
+                taskRecyclerAdapter.notifyDataSetChanged();
+                task_day.setText(day.getDayTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
+                        day.getDayTime().get(Calendar.DAY_OF_MONTH) + " " +
+                        day.getDayTime().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
+                        day.getDayTime().get(Calendar.YEAR));
+            });
         });
     }
 
