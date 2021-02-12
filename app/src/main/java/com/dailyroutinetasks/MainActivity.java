@@ -147,12 +147,25 @@ public class MainActivity extends AppCompatActivity {
                     });
                 } else {
                     tasks.get(position).setTitle(taskTitleText.toString());
+
+                    int durationHoursDifference = duration[0] - tasks.get(position).getDurationHours();
+                    int durationMinutesDifference = duration[1] - tasks.get(position).getDurationMinutes();
+
+                    for(int i=position+1; i < tasks.size(); i++){
+                        tasks.get(i).getStartTime().add(Calendar.HOUR, durationHoursDifference);
+                        tasks.get(i).getStartTime().add(Calendar.MINUTE, durationMinutesDifference);
+                    }
+
+                    day.getDayTime().add(Calendar.HOUR, durationHoursDifference);
+                    day.getDayTime().add(Calendar.MINUTE, durationMinutesDifference);
+
                     tasks.get(position).setDurationHours(duration[0]);
                     tasks.get(position).setDurationMinutes(duration[1]);
                     AsyncTask.execute(() -> {
-                        this.db.taskDao().update(tasks.get(position));
+                        this.db.taskDao().updateAll(tasks);
                     });
-                    taskRecyclerAdapter.notifyItemChanged(position);
+                    taskRecyclerAdapter.notifyDataSetChanged();
+                    
                 }
 
                 showBottomPanel(false);
