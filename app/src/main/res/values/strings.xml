@@ -22,6 +22,7 @@
     <string name="provide_correct_data">You need to provide correct data to all fields!</string>
     <string name="saved">Saved!</string>
     <string name="removed">Removed!</string>
+    <string name="copied">Copied!</string>
 
     <string name="system">System</string>
     <string name="start_day_time">Start day time</string>

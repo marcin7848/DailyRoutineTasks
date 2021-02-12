@@ -16,7 +16,6 @@ import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,7 +32,6 @@ import android.widget.Toast;
 
 import com.dailyroutinetasks.database.AppDatabase;
 import com.dailyroutinetasks.database.entities.Day;
-import com.dailyroutinetasks.database.entities.Setting;
 import com.dailyroutinetasks.database.entities.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -51,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     AppDatabase db;
     Dialog pickDayDialog;
+    Dialog copyFromDayDialog;
     Day day;
 
     boolean bottomPanelShown = false;
@@ -83,7 +82,10 @@ public class MainActivity extends AppCompatActivity {
         updateTasksView();
 
         pickDayDialog = new Dialog(this);
-        pickDayDialog.setContentView(R.layout.pick_day_view);
+        pickDayDialog.setContentView(R.layout.dialog_pick_day_view);
+
+        copyFromDayDialog = new Dialog(this);
+        copyFromDayDialog.setContentView(R.layout.dialog_pick_day_view);
 
         tasksRecyclerView = findViewById(R.id.tasksRecyclerView);
         taskRecyclerAdapter = new TaskRecyclerAdapter(MainActivity.this);
@@ -244,6 +246,48 @@ public class MainActivity extends AppCompatActivity {
 
             updateTasksView();
             pickDayDialog.hide();
+        });
+    }
+
+    public void showCopyFromDayDialog(View v){
+        pickDayDialog.show();
+        CalendarView pickDayCalendar = pickDayDialog.findViewById(R.id.pickDayCalendarView);
+        pickDayCalendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            day.getDayTime().set(year, month, dayOfMonth, start_day_time[0], start_day_time[1]);
+            tasks.clear();
+            lastPositionNumber = -1;
+
+            AsyncTask.execute(() -> {
+                Day foundDay = db.dayDao().getDayByDayString(GlobalFunctions
+                        .convertCalendarToDateString(day.getDayTime()));
+
+                if(foundDay != null){
+
+                    List<Task> copyTasks = db.taskDao().getTasksByDayId(foundDay.getId());
+
+
+                    copyTasks.forEach(ct -> {
+                        int newPositionNumber = lastPositionNumber+1;
+                        lastPositionNumber++;
+                        Calendar newCalendar = (Calendar) day.getDayTime().clone();
+                        long newId = this.db.taskDao().insert(new Task(ct.getTitle(),
+                                ct.getDurationHours(), ct.getDurationMinutes(),
+                                newPositionNumber, false, newCalendar, day.getId()));
+
+                        tasks.add(new Task(newId, ct.getTitle(), ct.getDurationHours(), ct.getDurationMinutes(),
+                                newPositionNumber, false, newCalendar, day.getId()));
+
+                        day.getDayTime().add(Calendar.HOUR, ct.getDurationHours());
+                        day.getDayTime().add(Calendar.MINUTE, ct.getDurationMinutes());
+                    });
+                }
+
+                runOnUiThread(() -> taskRecyclerAdapter.notifyItemInserted(tasks.size() - 1));
+            });
+
+            pickDayDialog.hide();
+            showBottomPanel(false);
+            Toast.makeText(MainActivity.this, R.string.copied, Toast.LENGTH_SHORT).show();
         });
     }
 

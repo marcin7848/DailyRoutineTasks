@@ -81,7 +81,8 @@
             android:textColor="@color/task_day_text"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:onClick="showCopyFromDayDialog"/>
 
         <TextView
             android:id="@+id/add_default_task"
