@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.dailyroutinetasks.database.AppDatabase;
 import com.dailyroutinetasks.database.entities.Day;
+import com.dailyroutinetasks.database.entities.DefaultTask;
 import com.dailyroutinetasks.database.entities.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -64,6 +65,11 @@ public class MainActivity extends AppCompatActivity {
     int[] start_day_time = {0, 0};
 
     int lastPositionNumber = -1;
+
+
+    List<DefaultTask> defaultTasks = new ArrayList<>();
+    DefaultTaskRecyclerAdapter defaultTaskRecyclerAdapter;
+    RecyclerView defaultTasksRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -298,7 +304,16 @@ public class MainActivity extends AppCompatActivity {
     public void showInsertDefaultTaskDialog(View v){
         insertDefaultTaskDialog.show();
 
-        //insertDefaultTaskDialog.hide();
+        defaultTasksRecyclerView = insertDefaultTaskDialog.findViewById(R.id.insertDefaultTaskRecyclerView);
+        defaultTaskRecyclerAdapter = new DefaultTaskRecyclerAdapter(MainActivity.this);
+        defaultTasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        defaultTasksRecyclerView.setAdapter(defaultTaskRecyclerAdapter);
+
+        AsyncTask.execute(() -> {
+            defaultTasks = db.defaultTaskDao().getAll();
+            runOnUiThread(() -> defaultTaskRecyclerAdapter.notifyDataSetChanged());
+        });
+
     }
 
     class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.TaskViewHolder> {
@@ -347,6 +362,71 @@ public class MainActivity extends AppCompatActivity {
                 duration = itemView.findViewById(R.id.task_duration_text);
                 time = itemView.findViewById(R.id.task_time_text);
                 taskDone = itemView.findViewById(R.id.checkBoxTaskDone);
+            }
+        }
+    }
+
+    class DefaultTaskRecyclerAdapter extends RecyclerView.Adapter<DefaultTaskRecyclerAdapter.DefaultTaskViewHolder> {
+        Context context;
+
+        public DefaultTaskRecyclerAdapter(Context c) {
+            this.context = c;
+        }
+
+        @NonNull
+        @Override
+        public DefaultTaskRecyclerAdapter.DefaultTaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View view = inflater.inflate(R.layout.default_task_row, parent, false);
+            return new DefaultTaskRecyclerAdapter.DefaultTaskViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull DefaultTaskRecyclerAdapter.DefaultTaskViewHolder holder, int position) {
+            holder.title.setText(defaultTasks.get(position).getTitle());
+            String minutes = defaultTasks.get(position).getDurationMinutes() < 10 ? "0" + defaultTasks.get(position).getDurationMinutes() : "" + defaultTasks.get(position).getDurationMinutes();
+            holder.duration.setText(String.format("%d:%sh", defaultTasks.get(position).getDurationHours(), minutes));
+
+            holder.itemView.setOnClickListener(v -> {
+                AsyncTask.execute(() -> {
+                    int newPositionNumber = lastPositionNumber+1;
+                    lastPositionNumber++;
+                    Calendar newCalendar = (Calendar) day.getDayTime().clone();
+
+                    long newId = db.taskDao().insert(new Task(defaultTasks.get(position).getTitle(),
+                            defaultTasks.get(position).getDurationHours(), defaultTasks.get(position).getDurationMinutes(),
+                            newPositionNumber, false, newCalendar, day.getId()));
+                    tasks.add(new Task(newId, defaultTasks.get(position).getTitle(),
+                            defaultTasks.get(position).getDurationHours(), defaultTasks.get(position).getDurationMinutes(),
+                            newPositionNumber, false, newCalendar, day.getId()));
+
+                    day.getDayTime().add(Calendar.HOUR, defaultTasks.get(position).getDurationHours());
+                    day.getDayTime().add(Calendar.MINUTE,  defaultTasks.get(position).getDurationMinutes());
+
+                    runOnUiThread(() -> {
+                        taskRecyclerAdapter.notifyItemInserted(tasks.size() - 1);
+                        insertDefaultTaskDialog.hide();
+                        showBottomPanel(false);
+                    });
+                });
+
+            });
+        }
+
+
+
+        @Override
+        public int getItemCount() {
+            return defaultTasks.size();
+        }
+
+        public class DefaultTaskViewHolder extends RecyclerView.ViewHolder {
+            TextView title, duration;
+
+            public DefaultTaskViewHolder(@NonNull View itemView) {
+                super(itemView);
+                title = itemView.findViewById(R.id.default_task_row_title);
+                duration = itemView.findViewById(R.id.default_task_duration_text);
             }
         }
     }
