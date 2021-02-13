@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     int lastPositionNumber = -1;
 
+    boolean showTasksDone = false;
 
     List<DefaultTask> defaultTasks = new ArrayList<>();
     DefaultTaskRecyclerAdapter defaultTaskRecyclerAdapter;
@@ -316,6 +317,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void showTasksDone(View v){
+        if(!showTasksDone){
+            showTasksDone = true;
+            taskRecyclerAdapter.notifyDataSetChanged();
+            TextView showTasksDoneText = findViewById(R.id.showTasksDone);
+            showTasksDoneText.setText(R.string.hide_tasks_done);
+        }else{
+            showTasksDone = false;
+            taskRecyclerAdapter.notifyDataSetChanged();
+            TextView showTasksDoneText = findViewById(R.id.showTasksDone);
+            showTasksDoneText.setText(R.string.show_tasks_done);
+        }
+    }
+
     class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.TaskViewHolder> {
         Context context;
 
@@ -343,6 +358,33 @@ public class MainActivity extends AppCompatActivity {
                 editPosition = position;
                 showBottomPanel(true);
             });
+
+            //TODO: do usunieica (zmiany na funkcje w tle do zmiany done)
+            holder.taskDone.setOnClickListener(v -> {
+                tasks.get(position).setDone(!tasks.get(position).isDone());
+                AsyncTask.execute(() -> {
+                    db.taskDao().update(tasks.get(position));
+                });
+
+                if(tasks.get(position).isDone()){
+                    holder.itemView.setVisibility(View.GONE);
+                    ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
+                    layoutParams.width = 0;
+                    layoutParams.height = 0;
+                    holder.itemView.setLayoutParams(layoutParams);
+                }
+            });
+            ////dotad
+
+            if(!showTasksDone){
+                if(tasks.get(position).isDone()){
+                    holder.itemView.setVisibility(View.GONE);
+                    ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
+                    layoutParams.width = 0;
+                    layoutParams.height = 0;
+                    holder.itemView.setLayoutParams(layoutParams);
+                }
+            }
         }
 
 
@@ -412,7 +454,6 @@ public class MainActivity extends AppCompatActivity {
 
             });
         }
-
 
 
         @Override

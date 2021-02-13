@@ -21,6 +21,20 @@
         android:clickable="true"
         android:onClick="showPickDayDialog"/>
 
+    <TextView
+        android:id="@+id/showTasksDone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/task_day_shape"
+        android:text="@string/show_tasks_done"
+        android:textColor="@color/task_day_text"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:onClick="showTasksDone"/>
+
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"

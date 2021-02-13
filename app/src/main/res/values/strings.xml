@@ -44,5 +44,7 @@
     <string name="add_new_task">Add new task</string>
     <string name="add_default_task">Add default task</string>
     <string name="copy_tasks_from_day">Copy tasks from day</string>
+    <string name="show_tasks_done">Show tasks done</string>
+    <string name="hide_tasks_done">Hide tasks done</string>
 
 </resources>
