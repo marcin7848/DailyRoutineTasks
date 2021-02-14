@@ -8,6 +8,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -185,6 +188,11 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, R.string.saved, Toast.LENGTH_SHORT).show();
             }
         });
+
+
+        Intent StartBackgroundService = new Intent(getApplicationContext(), StartBackgroundService.class);
+        sendBroadcast(StartBackgroundService);
+
     }
 
     @Override
@@ -359,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
                 showBottomPanel(true);
             });
 
-            //TODO: do usunieica (zmiany na funkcje w tle do zmiany done)
+            //TODO: do usunieica (zmiany na funkcje w tle do zmiany done chyba, że jak w servsie będzie update to nie będzie to potrzebne w ogóle)
             holder.taskDone.setOnClickListener(v -> {
                 tasks.get(position).setDone(!tasks.get(position).isDone());
                 AsyncTask.execute(() -> {
