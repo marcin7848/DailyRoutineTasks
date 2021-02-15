@@ -20,4 +20,7 @@ public interface TaskDao extends GenericDao<Task> {
     @Query("SELECT * FROM task where day_id = :dayId ORDER BY position_number ASC")
     List<Task> getTasksByDayId(Long dayId);
 
+    @Query("SELECT * FROM Task WHERE done = 0 AND id NOT IN (:exceptTasksIds)  ORDER BY start_time ASC LIMIT 1")
+    Task getNearestTask(List<Long> exceptTasksIds);
+
 }

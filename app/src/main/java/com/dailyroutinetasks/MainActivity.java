@@ -392,8 +392,15 @@ public class MainActivity extends AppCompatActivity {
                     layoutParams.height = 0;
                     holder.itemView.setLayoutParams(layoutParams);
                 }
+            }else{
+                holder.itemView.setVisibility(View.VISIBLE);
+                ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                holder.itemView.setLayoutParams(layoutParams);
             }
         }
+
 
 
 

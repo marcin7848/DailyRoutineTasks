@@ -7,34 +7,61 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.util.Log;
+
+import androidx.room.Room;
+
+import com.dailyroutinetasks.database.AppDatabase;
+import com.dailyroutinetasks.database.entities.Task;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class GenerateNotification extends BroadcastReceiver {
 
+    AppDatabase db;
+    List<Long> exceptTasksIds = new ArrayList<>();
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        //run this broadcast receiver after reboot // if not already is running (ale chyba nie muszę sprawdzać, bo jak usunę wszystkie alarmy to nie odpali się ponownie ten obecnie działający)
+        //TODO: run this broadcast receiver after reboot // if not already is running (ale chyba nie muszę sprawdzać, bo jak usunę wszystkie alarmy to nie odpali się ponownie ten obecnie działający)
         createNotificationChannel(context);
 
-        //clear all pending notifications
-        //load data from db and set alarm
-        //remember to add sending broadcast to this while deleting/editing/adding/moving tasks
-
         Intent notificationIntent = new Intent(context, DisplayNotification.class);
-        notificationIntent.putExtra("title", "TYtyulek");
-        notificationIntent.putExtra("text", "Contnencik");
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, notificationIntent, 0);
+        //clear all pending notifications
+        PendingIntent sender = PendingIntent.getBroadcast(context, 1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager3 = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        sender.cancel();
+        alarmManager3.cancel(sender);
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        db = Room.databaseBuilder(context,
+                AppDatabase.class, "dailyRoutineTasksDb").build();
 
-        long timeAtGet = System.currentTimeMillis();
+        exceptTasksIds.clear();
 
-        long tenSeconds = timeAtGet + 10 * 1000;
+        AsyncTask.execute(()-> {
+            Task task = getTaskToNotification();
+            if(task != null) {
+                //TODO: remember to add sending broadcast to this while deleting/editing/adding/moving tasks
+                //TODO: also -> notify widget reload data while editing/deleting etc.
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP,
-                tenSeconds,
-                pendingIntent);
+                notificationIntent.putExtra("title", task.getTitle());
+                notificationIntent.putExtra("text", "This task has just begun!");
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, notificationIntent, 0);
+
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+                alarmManager.set(AlarmManager.RTC_WAKEUP,
+                        task.getStartTime().getTimeInMillis(),
+                        pendingIntent);
+
+            }
+        });
 
     }
 
@@ -49,5 +76,27 @@ public class GenerateNotification extends BroadcastReceiver {
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(notificationChannel);
         }
+    }
+
+    private Task getTaskToNotification(){
+        Task task = db.taskDao().getNearestTask(exceptTasksIds);
+        if(task == null)
+            return null;
+
+        long currentTime = System.currentTimeMillis();
+        if(task.getStartTime().getTimeInMillis() < currentTime){
+            long timePlusDuration = task.getStartTime().getTimeInMillis() + task.getDurationHours() * 60*60*1000 + task.getDurationMinutes() * 60*1000;
+            if(timePlusDuration < currentTime){
+                task.setDone(true);
+                db.taskDao().update(task);
+                //TODO: notify widget to update content
+            }else{
+                exceptTasksIds.add(task.getId());
+            }
+            return getTaskToNotification();
+        }else{
+            return task;
+        }
+
     }
 }

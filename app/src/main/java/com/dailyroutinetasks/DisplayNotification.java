@@ -32,8 +32,7 @@ public class DisplayNotification extends BroadcastReceiver {
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         notificationManagerCompat.notify(generateId(), builder.build());
 
-        //clicking on notification should open the app
-        //send broadcast to generate notification again
+        //TODO: send broadcast to generate notification again
     }
 
     private int generateId(){
