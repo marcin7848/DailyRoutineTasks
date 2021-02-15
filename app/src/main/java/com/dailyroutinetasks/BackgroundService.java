@@ -29,7 +29,7 @@ public class BackgroundService extends Service {
                 PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         Notification notification =
-                new Notification.Builder(this, "1324")
+                new Notification.Builder(this, "dailyroutinetasksforeground")
                         .setContentTitle("title")
                         .setContentText("content")
                         .setSmallIcon(R.drawable.ic_foreground)
