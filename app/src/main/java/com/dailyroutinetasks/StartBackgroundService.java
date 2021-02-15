@@ -26,7 +26,7 @@ public class StartBackgroundService extends BroadcastReceiver {
             //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 //context.startForegroundService(new Intent(context, BackgroundService.class));
             //} else {
-                context.startService(new Intent(context, BackgroundService.class));
+                //context.startService(new Intent(context, BackgroundService.class));
             //}
 
         }

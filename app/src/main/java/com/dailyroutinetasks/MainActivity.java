@@ -190,8 +190,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        Intent StartBackgroundService = new Intent(getApplicationContext(), StartBackgroundService.class);
-        sendBroadcast(StartBackgroundService);
+        Intent sendNotification = new Intent(getApplicationContext(), GenerateNotification.class);
+        sendBroadcast(sendNotification);
 
     }
 
