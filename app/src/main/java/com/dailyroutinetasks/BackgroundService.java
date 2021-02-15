@@ -32,7 +32,7 @@ public class BackgroundService extends Service {
                 new Notification.Builder(this, "1324")
                         .setContentTitle("title")
                         .setContentText("content")
-                        //.setSmallIcon(R.drawable.icon)
+                        .setSmallIcon(R.drawable.ic_foreground)
                         .setContentIntent(pendingIntent)
                         .setTicker("ticker")
                         .build();
