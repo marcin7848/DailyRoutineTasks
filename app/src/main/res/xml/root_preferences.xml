@@ -11,19 +11,6 @@
             app:defaultValue="6\:00"
             />
 
-        <EditTextPreference
-            app:key="end_day_time"
-            app:title="@string/end_day_time"
-            app:useSimpleSummaryProvider="true"
-            app:defaultValue="23\:00" />
-
-        <EditTextPreference
-            app:key="number_of_days_ahead"
-            app:title="@string/number_of_days_ahead"
-            app:useSimpleSummaryProvider="true"
-            app:defaultValue="7"
-            app:singleLine="true"/>
-
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/system"
