@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, R.string.saved, Toast.LENGTH_SHORT).show();
             }
         });
-        
+
         //TODO: add updating task.done while reloading widget (because loop of notifications stops if there is no more tasks - so the last one is never changed to done)
 
         sendNotificationIntent();
