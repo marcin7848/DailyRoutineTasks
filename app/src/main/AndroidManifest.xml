@@ -31,21 +31,6 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-
-
-        <receiver android:name=".StartBackgroundService">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name=".BackgroundService"/>
-
-
-
-
-
         <activity
             android:name=".DefaultTasksActivity"
             android:label="@string/title_activity_default_tasks"
