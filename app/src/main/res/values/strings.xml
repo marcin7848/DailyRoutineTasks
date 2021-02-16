@@ -48,5 +48,9 @@
     <string name="hide_tasks_done">Hide tasks done</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="notifications_disabled">Notifications disabled</string>
+    <string name="notifications_enabled">Notifications enabled</string>
+    <string name="dark_mode_inactive">Dark mode inactive</string>
+    <string name="dark_mode_active">Dark mode active</string>
 
 </resources>

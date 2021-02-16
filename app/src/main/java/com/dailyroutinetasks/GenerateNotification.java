@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
 import com.dailyroutinetasks.database.AppDatabase;
@@ -45,7 +46,9 @@ public class GenerateNotification extends BroadcastReceiver {
 
         AsyncTask.execute(()-> {
             Task task = getTaskToNotification();
-            if(task != null) {
+            if(task != null && !PreferenceManager
+                    .getDefaultSharedPreferences(context).getBoolean("disable_notifications", false)) {
+
                 //TODO: remember to add sending broadcast to this while deleting/editing/adding/moving tasks
                 //TODO: also -> notify widget reload data while editing/deleting etc.
 

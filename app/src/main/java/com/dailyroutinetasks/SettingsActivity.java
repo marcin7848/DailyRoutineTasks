@@ -48,11 +48,12 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
+            //TODO: to delete unnecessary fields
             EditTextPreference start_day_time = getPreferenceManager().findPreference("start_day_time");
             EditTextPreference end_day_time = getPreferenceManager().findPreference("end_day_time");
             EditTextPreference number_of_days_ahead = getPreferenceManager().findPreference("number_of_days_ahead");
             SwitchPreferenceCompat dark_mode = getPreferenceManager().findPreference("dark_mode");
-            SwitchPreferenceCompat disable_notifications = getPreferenceManager().findPreference("notifications");
+            SwitchPreferenceCompat disable_notifications = getPreferenceManager().findPreference("disable_notifications");
 
             start_day_time.setOnPreferenceChangeListener((preference, newValue) -> {
                 if(startDayTimeValidate){
@@ -142,22 +143,21 @@ public class SettingsActivity extends AppCompatActivity {
                 //TODO: changing to dark mode
                 boolean value = (Boolean) newValue;
                 if(value){
-                    Toast.makeText(context, "Dark mode active //to edit", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.dark_mode_active, Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(context, "Dark mode inactive", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.dark_mode_inactive, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             });
 
             disable_notifications.setOnPreferenceChangeListener((preference, newValue) -> {
-                //TODO: notifications
                 boolean value = (Boolean) newValue;
                 if(value){
-                    Toast.makeText(context, "Notifications disabled //to edit", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.notifications_disabled, Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(context, "Notifications enabled", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.notifications_enabled, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             });

@@ -37,7 +37,7 @@
             app:defaultValue="false"/>
 
         <SwitchPreferenceCompat
-            app:key="notifications"
+            app:key="disable_notifications"
             app:title="@string/disable_notifications"
             android:summaryOn="@string/disable_notifications_on"
             android:summaryOff="@string/disable_notifications_off"
