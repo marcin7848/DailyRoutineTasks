@@ -45,8 +45,6 @@
             android:textColor="@color/duration_text"
             android:textStyle="bold" />
 
-
-
     </LinearLayout>
 
 </LinearLayout>

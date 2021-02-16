@@ -377,9 +377,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull TaskRecyclerAdapter.TaskViewHolder holder, int position) {
             holder.title.setText(tasks.get(position).getTitle());
+            holder.time.setText(GlobalFunctions.convertCalendarToTimeString(tasks.get(position).getStartTime()));
             String minutes = tasks.get(position).getDurationMinutes() < 10 ? "0" + tasks.get(position).getDurationMinutes() : "" + tasks.get(position).getDurationMinutes();
             holder.duration.setText(String.format("%d:%sh", tasks.get(position).getDurationHours(), minutes));
-            holder.time.setText(GlobalFunctions.convertCalendarToTimeString(tasks.get(position).getStartTime()));
             holder.taskDone.setChecked(tasks.get(position).isDone());
 
             holder.itemView.setOnClickListener(v -> {
@@ -419,8 +419,8 @@ public class MainActivity extends AppCompatActivity {
             public TaskViewHolder(@NonNull View itemView) {
                 super(itemView);
                 title = itemView.findViewById(R.id.task_row_title);
-                duration = itemView.findViewById(R.id.task_duration_text);
                 time = itemView.findViewById(R.id.task_time_text);
+                duration = itemView.findViewById(R.id.task_duration_text);
                 taskDone = itemView.findViewById(R.id.checkBoxTaskDone);
             }
         }

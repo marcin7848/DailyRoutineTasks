@@ -10,6 +10,9 @@ import android.widget.RemoteViews;
 import com.dailyroutinetasks.MainActivity;
 import com.dailyroutinetasks.R;
 
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class DailyRoutineTasksWidget extends AppWidgetProvider {
@@ -26,6 +29,13 @@ public class DailyRoutineTasksWidget extends AppWidgetProvider {
         Intent intentService = new Intent(context, TaskWidgetRemoteViewsService.class);
         remoteViews.setRemoteAdapter(R.id.widgetTasksList, intentService);
 
+        Calendar currentDay = Calendar.getInstance(TimeZone.getDefault());
+        String dayText = currentDay.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
+               currentDay.get(Calendar.DAY_OF_MONTH) + " " +
+               currentDay.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
+               currentDay.get(Calendar.YEAR);
+
+        remoteViews.setTextViewText(R.id.widget_task_day, dayText);
 
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
     }

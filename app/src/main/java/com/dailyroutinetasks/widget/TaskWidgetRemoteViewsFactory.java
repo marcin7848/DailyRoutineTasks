@@ -1,16 +1,15 @@
 package com.dailyroutinetasks.widget;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Binder;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import androidx.room.Room;
 
 import com.dailyroutinetasks.GlobalFunctions;
+import com.dailyroutinetasks.MainActivity;
 import com.dailyroutinetasks.R;
 import com.dailyroutinetasks.database.AppDatabase;
 import com.dailyroutinetasks.database.entities.Day;
@@ -23,12 +22,12 @@ import java.util.TimeZone;
 
 public class TaskWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory  {
 
-    private Context mContext;
+    private final Context context;
     AppDatabase db;
     List<Task> tasks = new ArrayList<>();
 
     public TaskWidgetRemoteViewsFactory(Context applicationContext, Intent intent) {
-        mContext = applicationContext;
+        context = applicationContext;
         db = Room.databaseBuilder(applicationContext,
                 AppDatabase.class, "dailyRoutineTasksDb").build();
     }
@@ -44,6 +43,7 @@ public class TaskWidgetRemoteViewsFactory implements RemoteViewsService.RemoteVi
         Day existingDay = db.dayDao().getDayByDayString(GlobalFunctions.convertCalendarToDateString(currentDay));
         if(existingDay != null){
             tasks.addAll(db.taskDao().getTasksByDayId(existingDay.getId()));
+            tasks.removeIf(Task::isDone);
         }
     }
 
@@ -58,11 +58,13 @@ public class TaskWidgetRemoteViewsFactory implements RemoteViewsService.RemoteVi
 
     @Override
     public RemoteViews getViewAt(int position) {
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.task_row_widget);
+        remoteViews.setTextViewText(R.id.widget_task_row_title, tasks.get(position).getTitle());
+        remoteViews.setTextViewText(R.id.widget_task_time_text, GlobalFunctions.convertCalendarToTimeString(tasks.get(position).getStartTime()));
+        String minutes = tasks.get(position).getDurationMinutes() < 10 ? "0" + tasks.get(position).getDurationMinutes() : "" + tasks.get(position).getDurationMinutes();
+        remoteViews.setTextViewText(R.id.widget_task_duration_text, String.format("%d:%sh", tasks.get(position).getDurationHours(), minutes));
 
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.task_row_widget);
-        rv.setTextViewText(R.id.widget_task_row_title, tasks.get(position).getTitle());
-
-        return rv;
+        return remoteViews;
     }
 
     @Override

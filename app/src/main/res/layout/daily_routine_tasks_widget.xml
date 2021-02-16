@@ -7,16 +7,17 @@
     android:id="@+id/widget">
     <FrameLayout android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView android:layout_width="match_parent"
-            android:id="@+id/widgetTitleLabel"
-            android:text="title"
-            android:textColor="@color/white"
-            android:background="@color/design_default_color_primary"
-            android:textSize="18dp"
-            android:gravity="center"
-            android:textAllCaps="true"
-            android:layout_height="0dp"/>
+        <TextView
+            android:id="@+id/widget_task_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/task_day_shape"
+            android:text="Thu 09.02.2021"
+            android:textColor="@color/task_day_text"
+            android:textStyle="bold"
+            android:layout_margin="5dp" />
     </FrameLayout>
+
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ListView android:id="@+id/widgetTasksList"
@@ -24,7 +25,7 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:dividerHeight="1dp"
-            android:divider="#eeeeee"
+            android:divider="#000000"
             tools:listitem="@layout/task_row_widget"/>
     </LinearLayout>
 </LinearLayout>
