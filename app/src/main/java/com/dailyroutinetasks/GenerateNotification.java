@@ -1,6 +1,7 @@
 package com.dailyroutinetasks;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -71,9 +72,12 @@ public class GenerateNotification extends BroadcastReceiver {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             CharSequence name = "DailyRoutineTasksChannel";
             String description = "Channel for Daily Routine Tasks";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel notificationChannel = new NotificationChannel("dailyRoutineTaskNotification", name, importance);
             notificationChannel.setDescription(description);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            long[] vibration = {500,200,200,500};
+            notificationChannel.setVibrationPattern(vibration);
 
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(notificationChannel);

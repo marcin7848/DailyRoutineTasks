@@ -189,7 +189,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //TODO: add updating task.done while opening main acitivity and while reloading widget (because loop of notifications stops if there is no more tasks - so the last one is never changed to done)
 
+        //TODO: maybe change position of the code below
         Intent sendNotification = new Intent(getApplicationContext(), GenerateNotification.class);
         sendBroadcast(sendNotification);
 

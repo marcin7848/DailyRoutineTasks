@@ -4,6 +4,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
+import android.view.WindowManager;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -22,17 +24,26 @@ public class DisplayNotification extends BroadcastReceiver {
         Intent openAppIntent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openAppIntent, 0);
 
+        long[] vibration = {500,200,200,500};
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "dailyRoutineTaskNotification")
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setContentIntent(pendingIntent)
+                .setVibrate(vibration)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         notificationManagerCompat.notify(generateId(), builder.build());
 
-        //TODO: send broadcast to generate notification again
+
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(
+                PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                "DailyRoutineTasks::NotificationWakeUpScreen");
+        wakeLock.acquire(20*1000L);
+        
         Intent sendNotification = new Intent(context, GenerateNotification.class);
         context.sendBroadcast(sendNotification);
     }
@@ -41,4 +52,5 @@ public class DisplayNotification extends BroadcastReceiver {
         Date now = new Date();
         return Integer.parseInt(new SimpleDateFormat("ddHHmmss", Locale.getDefault()).format(now));
     }
+
 }
