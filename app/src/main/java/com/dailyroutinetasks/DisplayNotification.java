@@ -33,6 +33,8 @@ public class DisplayNotification extends BroadcastReceiver {
         notificationManagerCompat.notify(generateId(), builder.build());
 
         //TODO: send broadcast to generate notification again
+        Intent sendNotification = new Intent(context, GenerateNotification.class);
+        context.sendBroadcast(sendNotification);
     }
 
     private int generateId(){

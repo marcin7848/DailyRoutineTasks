@@ -59,10 +59,9 @@ public class GenerateNotification extends BroadcastReceiver {
 
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-                alarmManager.set(AlarmManager.RTC_WAKEUP,
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
                         task.getStartTime().getTimeInMillis(),
                         pendingIntent);
-
             }
         });
 
