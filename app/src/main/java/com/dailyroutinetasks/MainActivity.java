@@ -159,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
                         day.getDayTime().add(Calendar.HOUR, duration[0]);
                         day.getDayTime().add(Calendar.MINUTE, duration[1]);
 
+                        sendNotificationIntent();
+
                         runOnUiThread(() -> taskRecyclerAdapter.notifyItemInserted(tasks.size() - 1));
                     });
                 } else {
@@ -179,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
                     tasks.get(position).setDurationMinutes(duration[1]);
                     AsyncTask.execute(() -> {
                         this.db.taskDao().updateAll(tasks);
+                        sendNotificationIntent();
                     });
                     taskRecyclerAdapter.notifyDataSetChanged();
 
@@ -191,10 +194,12 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO: add updating task.done while opening main acitivity and while reloading widget (because loop of notifications stops if there is no more tasks - so the last one is never changed to done)
 
-        //TODO: maybe change position of the code below
+        sendNotificationIntent();
+    }
+
+    private void sendNotificationIntent(){
         Intent sendNotification = new Intent(getApplicationContext(), GenerateNotification.class);
         sendBroadcast(sendNotification);
-
     }
 
     @Override
@@ -369,23 +374,6 @@ public class MainActivity extends AppCompatActivity {
                 showBottomPanel(true);
             });
 
-            //TODO: do usunieica (zmiany na funkcje w tle do zmiany done chyba, że jak w servsie będzie update to nie będzie to potrzebne w ogóle)
-            holder.taskDone.setOnClickListener(v -> {
-                tasks.get(position).setDone(!tasks.get(position).isDone());
-                AsyncTask.execute(() -> {
-                    db.taskDao().update(tasks.get(position));
-                });
-
-                if(tasks.get(position).isDone()){
-                    holder.itemView.setVisibility(View.GONE);
-                    ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
-                    layoutParams.width = 0;
-                    layoutParams.height = 0;
-                    holder.itemView.setLayoutParams(layoutParams);
-                }
-            });
-            ////dotad
-
             if(!showTasksDone){
                 if(tasks.get(position).isDone()){
                     holder.itemView.setVisibility(View.GONE);
@@ -554,6 +542,7 @@ public class MainActivity extends AppCompatActivity {
 
                 AsyncTask.execute(() -> {
                     db.taskDao().updateAll(updateTasks);
+                    sendNotificationIntent();
                 });
 
                 recyclerView.getAdapter().notifyItemChanged(fromPosition);
@@ -595,6 +584,7 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(() -> taskRecyclerAdapter.notifyDataSetChanged());
 
                     db.taskDao().updateAll(tasks);
+                    sendNotificationIntent();
                 });
 
                 Toast.makeText(MainActivity.this, R.string.removed, Toast.LENGTH_SHORT).show();

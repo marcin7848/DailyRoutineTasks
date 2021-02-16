@@ -49,8 +49,7 @@ public class GenerateNotification extends BroadcastReceiver {
             if(task != null && !PreferenceManager
                     .getDefaultSharedPreferences(context).getBoolean("disable_notifications", false)) {
 
-                //TODO: remember to add sending broadcast to this while deleting/editing/adding/moving tasks
-                //TODO: also -> notify widget reload data while editing/deleting etc.
+                //TODO: also -> notify widget reload data while deleting/editing/adding/moving etc.
 
                 notificationIntent.putExtra("title", task.getTitle());
                 notificationIntent.putExtra("text", "This task has just begun!");
