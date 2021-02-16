@@ -14,9 +14,6 @@ import com.dailyroutinetasks.R;
 
 public class DailyRoutineTasksWidget extends AppWidgetProvider {
 
-
-
-
     public void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 

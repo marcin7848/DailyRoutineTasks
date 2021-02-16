@@ -36,6 +36,21 @@
                 app:layout_constraintHorizontal_bias="0.0" />
 
             <TextView
+                android:id="@+id/task_time_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/time_shape"
+                android:text="23:45"
+                android:textColor="@color/time_text"
+                android:textStyle="bold"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintTop_toBottomOf="@+id/task_row_title"
+                app:layout_constraintBottom_toBottomOf="@+id/straightLineView2"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
                 android:id="@+id/task_duration_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -47,22 +62,10 @@
                 android:textColor="@color/duration_text"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/straightLineView2"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/task_time_text"
                 app:layout_constraintTop_toBottomOf="@+id/task_row_title" />
 
-            <TextView
-                android:id="@+id/task_time_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/time_shape"
-                android:text="23:45"
-                android:textColor="@color/time_text"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/task_duration_text"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"/>
+
 
             <View
                 android:id="@+id/straightLineView2"
