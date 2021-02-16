@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 import androidx.room.Room;
@@ -19,7 +18,6 @@ import com.dailyroutinetasks.database.AppDatabase;
 import com.dailyroutinetasks.database.entities.Task;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class GenerateNotification extends BroadcastReceiver {
@@ -83,7 +81,7 @@ public class GenerateNotification extends BroadcastReceiver {
     }
 
     private Task getTaskToNotification(){
-        Task task = db.taskDao().getNearestTask(exceptTasksIds);
+        Task task = db.taskDao().getNearestTaskExceptIds(exceptTasksIds);
         if(task == null)
             return null;
 

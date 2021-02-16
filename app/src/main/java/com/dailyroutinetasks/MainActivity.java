@@ -8,9 +8,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -191,8 +188,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, R.string.saved, Toast.LENGTH_SHORT).show();
             }
         });
-
-        //TODO: add updating task.done while opening main acitivity and while reloading widget (because loop of notifications stops if there is no more tasks - so the last one is never changed to done)
+        
+        //TODO: add updating task.done while reloading widget (because loop of notifications stops if there is no more tasks - so the last one is never changed to done)
 
         sendNotificationIntent();
     }
@@ -200,6 +197,21 @@ public class MainActivity extends AppCompatActivity {
     private void sendNotificationIntent(){
         Intent sendNotification = new Intent(getApplicationContext(), GenerateNotification.class);
         sendBroadcast(sendNotification);
+    }
+
+    private void updateTasksDone(){
+        Task task = db.taskDao().getNearestTask();
+        if(task == null)
+            return;
+
+        long currentTime = System.currentTimeMillis();
+        long timePlusDuration = task.getStartTime().getTimeInMillis() + task.getDurationHours() * 60*60*1000 + task.getDurationMinutes() * 60*1000;
+        if(timePlusDuration < currentTime) {
+            task.setDone(true);
+            db.taskDao().update(task);
+            updateTasksDone();
+            //TODO: notify widget to update content while this
+        }
     }
 
     @Override
@@ -242,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
                 day.setDayString(newDay.getDayString());
                 lastPositionNumber = -1;
             }else{
+                updateTasksDone();
                 tasks.addAll(db.taskDao().getTasksByDayId(existingDay.getId()));
                 lastPositionNumber = tasks.size()-1;
                 day.setId(existingDay.getId());
