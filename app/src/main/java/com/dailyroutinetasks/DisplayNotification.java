@@ -43,7 +43,7 @@ public class DisplayNotification extends BroadcastReceiver {
                 PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
                 "DailyRoutineTasks::NotificationWakeUpScreen");
         wakeLock.acquire(20*1000L);
-        
+
         Intent sendNotification = new Intent(context, GenerateNotification.class);
         context.sendBroadcast(sendNotification);
     }

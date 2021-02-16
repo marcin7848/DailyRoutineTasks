@@ -29,7 +29,6 @@ public class GenerateNotification extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //TODO: run this broadcast receiver after reboot // if not already is running (ale chyba nie muszę sprawdzać, bo jak usunę wszystkie alarmy to nie odpali się ponownie ten obecnie działający)
         createNotificationChannel(context);
 
         Intent notificationIntent = new Intent(context, DisplayNotification.class);
