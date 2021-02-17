@@ -4,6 +4,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.PowerManager;
 import android.view.WindowManager;
 
@@ -25,6 +27,7 @@ public class DisplayNotification extends BroadcastReceiver {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openAppIntent, 0);
 
         long[] vibration = {500,200,200,500};
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "dailyRoutineTaskNotification")
                 .setSmallIcon(R.drawable.ic_notifications)
@@ -32,7 +35,9 @@ public class DisplayNotification extends BroadcastReceiver {
                 .setContentText(text)
                 .setContentIntent(pendingIntent)
                 .setVibrate(vibration)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setSound(sound)
+                .setLights(0xff00ffff, 300, 100)
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         notificationManagerCompat.notify(generateId(), builder.build());
