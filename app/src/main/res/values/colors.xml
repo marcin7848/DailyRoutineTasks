@@ -21,4 +21,6 @@
 
     <color name="bottom_panel_color_day">#FFFFFFFF</color>
     <color name="bottom_panel_color_night">#FF141414</color>
+    <color name="main_background_day">#FFFFFFFF</color>
+    <color name="main_background_night">#FF262626</color>
 </resources>

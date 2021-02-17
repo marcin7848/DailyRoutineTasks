@@ -14,6 +14,7 @@
         <!-- Customize your theme here. -->
 
         <item name="bottom_panel_color">@color/bottom_panel_color_day</item>
+        <item name="main_background">@color/main_background_day</item>
     </style>
 
 </resources>

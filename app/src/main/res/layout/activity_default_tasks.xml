@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/defaultTasksParent"
-    tools:context=".DefaultTasksActivity">
+    tools:context=".DefaultTasksActivity"
+    android:background="?attr/main_background">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/defaultTasksRecyclerView"
