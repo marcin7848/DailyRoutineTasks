@@ -17,6 +17,7 @@ import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -96,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
         start_day_time = GlobalFunctions.convertDayTime(PreferenceManager
                 .getDefaultSharedPreferences(this)
                 .getString("start_day_time", "6:00"));
-
-        updateTasksView();
 
         pickDayDialog = new Dialog(this);
         pickDayDialog.setContentView(R.layout.dialog_pick_day_view);
@@ -199,6 +198,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateTasksView();
         sendNotificationIntent();
     }
 
