@@ -36,6 +36,7 @@ public class DisplayNotification extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setVibrate(vibration)
                 .setSound(sound)
+                .setAutoCancel(true)
                 .setLights(0xff00ffff, 300, 100)
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
 
