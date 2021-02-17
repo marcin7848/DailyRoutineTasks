@@ -81,7 +81,7 @@
         android:layout_height="200dp"
         app:layout_constraintBottom_toBottomOf="@+id/tasksParent"
         android:clickable="true"
-        android:background="@color/white"
+        android:background="?attr/bottom_panel_color"
         android:visibility="gone"
         android:padding="10dp">
 
@@ -153,6 +153,7 @@
             android:text="@string/save"
             android:backgroundTint="@color/design_default_color_primary"
             android:layout_gravity="end"
+            android:textColor="@color/task_day_text"
             app:layout_constraintBottom_toBottomOf="@+id/tasksBottomPanel"
             app:layout_constraintEnd_toEndOf="@+id/tasksBottomPanel"
             android:layout_marginEnd="5dp"

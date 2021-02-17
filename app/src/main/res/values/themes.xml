@@ -13,7 +13,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
 
-        <item name="task_day_background">@color/task_day_background_white</item>
+        <item name="bottom_panel_color">@color/bottom_panel_color_day</item>
     </style>
 
 </resources>

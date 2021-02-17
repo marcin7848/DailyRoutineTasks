@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="task_day_background" format="reference" />
+    <attr name="bottom_panel_color" format="reference" />
 </resources>
