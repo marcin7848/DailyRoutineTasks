@@ -16,6 +16,7 @@ import androidx.room.Room;
 
 import com.dailyroutinetasks.database.AppDatabase;
 import com.dailyroutinetasks.database.entities.Task;
+import com.dailyroutinetasks.widget.DailyRoutineTasksWidget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,10 +45,12 @@ public class GenerateNotification extends BroadcastReceiver {
 
         AsyncTask.execute(()-> {
             Task task = getTaskToNotification();
+
+            DailyRoutineTasksWidget.sendRefreshBroadcast(context);
+
+
             if(task != null && !PreferenceManager
                     .getDefaultSharedPreferences(context).getBoolean("disable_notifications", false)) {
-
-                //TODO: also -> notify widget reload data while deleting/editing/adding/moving etc.
 
                 notificationIntent.putExtra("title", task.getTitle());
                 notificationIntent.putExtra("text", "This task has just begun!");
@@ -91,7 +94,6 @@ public class GenerateNotification extends BroadcastReceiver {
             if(timePlusDuration < currentTime){
                 task.setDone(true);
                 db.taskDao().update(task);
-                //TODO: notify widget to update content
             }else{
                 exceptTasksIds.add(task.getId());
             }

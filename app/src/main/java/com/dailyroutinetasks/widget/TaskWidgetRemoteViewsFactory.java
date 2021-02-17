@@ -39,6 +39,7 @@ public class TaskWidgetRemoteViewsFactory implements RemoteViewsService.RemoteVi
 
     @Override
     public void onDataSetChanged() {
+        tasks.clear();
         Calendar currentDay = Calendar.getInstance(TimeZone.getDefault());
         Day existingDay = db.dayDao().getDayByDayString(GlobalFunctions.convertCalendarToDateString(currentDay));
         if(existingDay != null){

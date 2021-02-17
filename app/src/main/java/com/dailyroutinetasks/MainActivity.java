@@ -210,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
             task.setDone(true);
             db.taskDao().update(task);
             updateTasksDone();
-            //TODO: notify widget to update content while this
         }
     }
 

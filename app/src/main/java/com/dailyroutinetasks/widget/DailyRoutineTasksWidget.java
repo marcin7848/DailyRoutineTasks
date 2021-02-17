@@ -3,6 +3,7 @@ package com.dailyroutinetasks.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -16,6 +17,25 @@ import java.util.TimeZone;
 
 
 public class DailyRoutineTasksWidget extends AppWidgetProvider {
+
+    public static void sendRefreshBroadcast(Context context) {
+        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.setComponent(new ComponentName(context, DailyRoutineTasksWidget.class));
+        context.sendBroadcast(intent);
+    }
+
+    @Override
+    public void onReceive(final Context context, Intent intent) {
+        final String action = intent.getAction();
+        if (action.equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+            // refresh all your widgets
+            AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+            ComponentName cn = new ComponentName(context, DailyRoutineTasksWidget.class);
+            mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.widgetTasksList);
+        }
+        super.onReceive(context, intent);
+    }
+
 
     public void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
