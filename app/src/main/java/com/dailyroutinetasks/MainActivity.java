@@ -189,8 +189,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //TODO: add updating task.done while reloading widget (because loop of notifications stops if there is no more tasks - so the last one is never changed to done)
-
         sendNotificationIntent();
     }
 
