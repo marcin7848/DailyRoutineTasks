@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.preference.EditTextPreference;
 import androidx.preference.EditTextPreferenceDialogFragmentCompat;
@@ -80,12 +81,14 @@ public class SettingsActivity extends AppCompatActivity {
 
 
             dark_mode.setOnPreferenceChangeListener((preference, newValue) -> {
-                //TODO: changing to dark mode
                 boolean value = (Boolean) newValue;
                 if(value){
+                    //TODO: switching dark mode causes exception
+                    //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                     Toast.makeText(context, R.string.dark_mode_active, Toast.LENGTH_SHORT).show();
                 }
                 else{
+                    //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                     Toast.makeText(context, R.string.dark_mode_inactive, Toast.LENGTH_SHORT).show();
                 }
                 return true;

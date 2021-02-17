@@ -2,6 +2,7 @@ package com.dailyroutinetasks;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -76,6 +77,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        boolean isDarkModeEnabled = PreferenceManager
+                .getDefaultSharedPreferences(this)
+                .getBoolean("dark_mode", false);
+
+        if(isDarkModeEnabled)
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        else
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "dailyRoutineTasksDb").build();
