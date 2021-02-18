@@ -94,10 +94,6 @@ public class MainActivity extends AppCompatActivity {
         day = new Day();
         day.setDayTime(Calendar.getInstance(TimeZone.getDefault()));
 
-        start_day_time = GlobalFunctions.convertDayTime(PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getString("start_day_time", "6:00"));
-
         pickDayDialog = new Dialog(this);
         pickDayDialog.setContentView(R.layout.dialog_pick_day_view);
 
@@ -203,6 +199,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        start_day_time = GlobalFunctions.convertDayTime(PreferenceManager
+                .getDefaultSharedPreferences(this)
+                .getString("start_day_time", "6:00"));
+        
         updateTasksView();
         sendNotificationIntent();
     }
