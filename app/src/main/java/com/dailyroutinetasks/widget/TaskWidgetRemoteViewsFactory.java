@@ -65,6 +65,11 @@ public class TaskWidgetRemoteViewsFactory implements RemoteViewsService.RemoteVi
         String minutes = tasks.get(position).getDurationMinutes() < 10 ? "0" + tasks.get(position).getDurationMinutes() : "" + tasks.get(position).getDurationMinutes();
         remoteViews.setTextViewText(R.id.widget_task_duration_text, String.format("%d:%sh", tasks.get(position).getDurationHours(), minutes));
 
+        Calendar finishTime = (Calendar) tasks.get(position).getStartTime().clone();
+        finishTime.add(Calendar.HOUR, tasks.get(position).getDurationHours());
+        finishTime.add(Calendar.MINUTE, tasks.get(position).getDurationMinutes());
+        remoteViews.setTextViewText(R.id.widget_task_finish_time_text, GlobalFunctions.convertCalendarToTimeString(finishTime));
+
         return remoteViews;
     }
 

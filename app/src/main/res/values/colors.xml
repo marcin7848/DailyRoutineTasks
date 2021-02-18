@@ -18,6 +18,8 @@
     <color name="light_blue_200">#FF81D4FA</color>
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
+    <color name="finish_time_background">#FF5B0E2D</color>
+    <color name="finish_time_text">#FFFFA781</color>
 
     <color name="bottom_panel_color_day">#FFFFFFFF</color>
     <color name="bottom_panel_color_night">#FF141414</color>

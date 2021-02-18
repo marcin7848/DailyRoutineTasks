@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/time_shape"
-            android:text="23:45"
+            android:text="11:00"
             android:textColor="@color/time_text"
             android:textStyle="bold"
             android:layout_marginStart="4dp"
@@ -41,8 +41,20 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:background="@drawable/duration_shape"
-            android:text="1:55h"
+            android:text="1:50h"
             android:textColor="@color/duration_text"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_task_finish_time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/finish_time_shape"
+            android:text="12:50"
+            android:textColor="@color/finish_time_text"
             android:textStyle="bold" />
 
     </LinearLayout>

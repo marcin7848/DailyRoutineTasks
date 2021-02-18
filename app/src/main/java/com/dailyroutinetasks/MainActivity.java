@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         start_day_time = GlobalFunctions.convertDayTime(PreferenceManager
                 .getDefaultSharedPreferences(this)
                 .getString("start_day_time", "6:00"));
-        
+
         updateTasksView();
         sendNotificationIntent();
     }
@@ -393,6 +393,11 @@ public class MainActivity extends AppCompatActivity {
             holder.time.setText(GlobalFunctions.convertCalendarToTimeString(tasks.get(position).getStartTime()));
             String minutes = tasks.get(position).getDurationMinutes() < 10 ? "0" + tasks.get(position).getDurationMinutes() : "" + tasks.get(position).getDurationMinutes();
             holder.duration.setText(String.format("%d:%sh", tasks.get(position).getDurationHours(), minutes));
+            Calendar finishTime = (Calendar) tasks.get(position).getStartTime().clone();
+            finishTime.add(Calendar.HOUR, tasks.get(position).getDurationHours());
+            finishTime.add(Calendar.MINUTE, tasks.get(position).getDurationMinutes());
+            holder.finishTime.setText(GlobalFunctions.convertCalendarToTimeString(finishTime));
+
             holder.taskDone.setChecked(tasks.get(position).isDone());
 
             holder.itemView.setOnClickListener(v -> {
@@ -426,7 +431,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public class TaskViewHolder extends RecyclerView.ViewHolder {
-            TextView title, duration, time;
+            TextView title, time, duration, finishTime;
             CheckBox taskDone;
 
             public TaskViewHolder(@NonNull View itemView) {
@@ -434,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
                 title = itemView.findViewById(R.id.task_row_title);
                 time = itemView.findViewById(R.id.task_time_text);
                 duration = itemView.findViewById(R.id.task_duration_text);
+                finishTime = itemView.findViewById(R.id.task_finish_time_text);
                 taskDone = itemView.findViewById(R.id.checkBoxTaskDone);
             }
         }
