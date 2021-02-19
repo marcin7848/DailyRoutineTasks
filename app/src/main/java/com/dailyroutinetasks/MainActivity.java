@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         day = new Day();
         day.setDayTime(Calendar.getInstance(TimeZone.getDefault()));
+        day.setDayString(GlobalFunctions.convertCalendarToDateString(Calendar.getInstance(TimeZone.getDefault())));
 
         pickDayDialog = new Dialog(this);
         pickDayDialog.setContentView(R.layout.dialog_pick_day_view);
@@ -258,9 +259,11 @@ public class MainActivity extends AppCompatActivity {
         tasks.clear();
 
         AsyncTask.execute(() ->{
-            Day existingDay = db.dayDao().getDayByDayString(GlobalFunctions.convertCalendarToDateString(day.getDayTime()));
+            Calendar pickedDay = GlobalFunctions.convertStringDateToCalendar(day.getDayString());
+
+            Day existingDay = db.dayDao().getDayByDayString(GlobalFunctions.convertCalendarToDateString(pickedDay));
             if(existingDay == null){
-                Day newDay = new Day(day.getDayTime(), GlobalFunctions.convertCalendarToDateString(day.getDayTime()));
+                Day newDay = new Day(pickedDay, GlobalFunctions.convertCalendarToDateString(pickedDay));
                 long newDayId = db.dayDao().insert(newDay);
                 day.setId(newDayId);
                 day.setDayTime(newDay.getDayTime());
@@ -282,10 +285,11 @@ public class MainActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 taskRecyclerAdapter.notifyDataSetChanged();
-                task_day.setText(day.getDayTime().getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
-                        day.getDayTime().get(Calendar.DAY_OF_MONTH) + " " +
-                        day.getDayTime().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
-                        day.getDayTime().get(Calendar.YEAR));
+
+                task_day.setText(pickedDay.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()) + " " +
+                        pickedDay.get(Calendar.DAY_OF_MONTH) + " " +
+                        pickedDay.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " +
+                        pickedDay.get(Calendar.YEAR));
             });
         });
     }
@@ -295,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
         CalendarView pickDayCalendar = pickDayDialog.findViewById(R.id.pickDayCalendarView);
         pickDayCalendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             day.getDayTime().set(year, month, dayOfMonth);
+            day.setDayString(GlobalFunctions.convertCalendarToDateString(day.getDayTime()));
 
             updateTasksView();
             pickDayDialog.hide();

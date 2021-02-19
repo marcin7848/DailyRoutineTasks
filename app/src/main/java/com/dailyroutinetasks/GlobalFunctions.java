@@ -11,9 +11,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public abstract class GlobalFunctions  {
 
@@ -68,6 +70,17 @@ public abstract class GlobalFunctions  {
 
     public static String convertCalendarToDateString(Calendar calendar) {
         return new SimpleDateFormat( "yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
+    }
+
+    public static Calendar convertStringDateToCalendar(String date) {
+        Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try {
+            cal.setTime(sdf.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return cal;
     }
 
     public static String convertCalendarToTimeString(Calendar calendar) {
