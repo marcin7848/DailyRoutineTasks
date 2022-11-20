@@ -8,7 +8,7 @@ Download and gradle build the app, the .apk file is created in app/release/
 - min android sdk version: 26 (Android 8.0)
 - gradle 4.1
 
-![image](./image.jpg?raw=true "DailyRoutineTasks")
+![image](./image.jpg "DailyRoutineTasks")
 
 ## Features
 - Setting the starting day point (the time at which the first task of the day begins)
